@@ -2667,7 +2667,7 @@
         <div class="stat-value" id="statPages">0</div>
       </div>
       <div class="stat-card" style="border-color:#fde68a;background:#fffbeb;" id="statBookmarkCard">
-        <div class="stat-label" style="color:#92400e;">Bookmarked</div>
+        <div class="stat-label" style="color:#92400e;">Ditandai <span style="font-size:9px;opacity:0.7">(sementara)</span></div>
         <div class="stat-value" style="color:#f59e0b;" id="statBookmark">0</div>
       </div>
     </div>
@@ -2766,7 +2766,7 @@
           </label>
           <label class="toggle-pill" style="border-color:#fde68a;background:#fffbeb;color:#92400e;" id="filterBookmarkPill">
             <input type="checkbox" id="filterBookmark" onchange="applyFilters()">
-            <span>🔖 Bookmarked <span class="bookmark-count-badge" id="bookmarkToggleBadge" style="display:none">0</span></span>
+            <span>🔖 Ditandai <span class="bookmark-count-badge" id="bookmarkToggleBadge" style="display:none">0</span></span>
           </label>
         </div>
       </div>
@@ -2954,7 +2954,7 @@
   const LS_TOKEN     = 'adspy_apify_token';
   const LS_HISTORY   = 'adspy_url_history';
   const LS_DATA      = 'adspy_last_data';
-  const LS_BOOKMARKS = 'adspy_bookmarks';
+  const LS_BOOKMARKS = null; // Bookmark sekarang hanya sementara (session only, tidak disimpan ke localStorage)
   const MAX_HISTORY  = 20;
 
   // ─── STORAGE LAYER ────────────────────────────────────────────
@@ -3116,22 +3116,15 @@
   let bookmarkedIds = new Set();
 
   function loadBookmarks() {
-    try {
-      const saved = store.get(LS_BOOKMARKS);
-      bookmarkedIds = new Set(saved ? JSON.parse(saved) : []);
-    } catch(e) {
-      console.warn('AdSpy: gagal load bookmarks', e);
-      bookmarkedIds = new Set();
-    }
+    // Bookmark hanya sementara — reset setiap refresh, tidak dibaca dari localStorage
+    // Hapus data lama jika masih ada dari versi sebelumnya
+    try { localStorage.removeItem('adspy_bookmarks'); } catch(e) {}
+    bookmarkedIds = new Set();
     updateBookmarkUI();
   }
 
   function saveBookmarks() {
-    try {
-      store.set(LS_BOOKMARKS, JSON.stringify([...bookmarkedIds]));
-    } catch(e) {
-      console.warn('AdSpy: gagal simpan bookmarks', e);
-    }
+    // Tidak disimpan ke localStorage — bookmark bersifat sementara (session only)
   }
 
   function toggleBookmark(adId, btn) {
@@ -3139,15 +3132,15 @@
     if (bookmarkedIds.has(adId)) {
       bookmarkedIds.delete(adId);
       btn.classList.remove('bookmarked');
-      btn.textContent = '🔖 Simpan';
-      btn.title = 'Simpan bookmark';
-      showToast('Bookmark dihapus', false);
+      btn.textContent = '🔖 Tandai';
+      btn.title = 'Tandai sementara (hilang saat refresh)';
+      showToast('Tanda dihapus', false);
     } else {
       bookmarkedIds.add(adId);
       btn.classList.add('bookmarked');
-      btn.textContent = '🔖 Tersimpan';
-      btn.title = 'Hapus bookmark';
-      showToast('✓ Iklan disimpan ke bookmark!', true);
+      btn.textContent = '🔖 Ditandai';
+      btn.title = 'Hapus tanda';
+      showToast('✓ Iklan ditandai! (Sementara — gunakan 📁 Koleksi untuk simpan permanen)', true);
     }
     saveBookmarks();
     updateBookmarkUI();
@@ -4603,8 +4596,8 @@
             '<div class="status-dot"></div>' + (isActive ? 'Aktif' : 'Nonaktif') +
           '</div>' +
           '<div style="display:flex;gap:4px">' +
-            '<button class="btn-bookmark' + (isBookmarked ? ' bookmarked' : '') + '" onclick="toggleBookmark(\'' + adId + '\', this)" title="' + (isBookmarked ? 'Hapus bookmark' : 'Simpan bookmark') + '">' +
-              (isBookmarked ? '🔖 Tersimpan' : '🔖 Simpan') +
+            '<button class="btn-bookmark' + (isBookmarked ? ' bookmarked' : '') + '" onclick="toggleBookmark(\'' + adId + '\', this)" title="' + (isBookmarked ? 'Hapus tanda' : 'Tandai sementara (hilang saat refresh)') + '">' +
+              (isBookmarked ? '🔖 Ditandai' : '🔖 Tandai') +
             '</button>' +
             '<div class="collection-dropdown-wrap" style="position:relative">' +
               '<button class="btn-collection' + (getAdCollections(adId).length > 0 ? ' in-collection' : '') + '" data-col-btn-id="' + adId + '" onclick="toggleColDropdown(event,\'' + adId + '\')" title="Simpan ke koleksi">📁' + (getAdCollections(adId).length > 0 ? ' ' + getAdCollections(adId).length : '') + '</button>' +
