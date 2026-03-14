@@ -2526,6 +2526,8 @@
   .btn-col-note:hover { background: #fef3c7; }
   .btn-col-remove { background: #fef2f2; border: 1px solid rgba(232,40,74,0.2); color: var(--accent); font-size: 10px; font-weight: 600; padding: 5px 7px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .btn-col-remove:hover { background: rgba(232,40,74,0.1); }
+  .btn-col-adlib { background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; font-size: 13px; font-weight: 600; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; transition: background 0.15s; flex-shrink: 0; }
+  .btn-col-adlib:hover { background: #ffedd5; }
   .note-editor { display: none; padding: 7px 9px; border-top: 1px solid #fde68a; background: #fffbeb; }
   .note-editor.open { display: block; }
   .note-ta { width: 100%; background: var(--bg); border: 1px solid #fde68a; border-radius: 5px; padding: 5px 8px; font-size: 11px; font-family: 'DM Sans', sans-serif; resize: none; outline: none; color: var(--text); min-height: 50px; }
@@ -3450,6 +3452,7 @@
         (item.note ? '<div class="col-ad-note">' + escHtml(item.note) + '</div>' : '') +
         '<div class="col-ad-actions">' +
           '<button class="btn-col-note" onclick="toggleNoteEditor(\'' + cardId + '\',\'' + colId + '\',\'' + adId + '\')">📝 ' + (item.note ? 'Edit Catatan' : 'Tambah Catatan') + '</button>' +
+          (ad.ad_library_url ? '<a class="btn-col-adlib" href="' + escHtml(ad.ad_library_url) + '" target="_blank" rel="noopener" title="Buka di FB Ads Library">📚</a>' : '') +
           '<button class="btn-col-remove" onclick="removeFromCollection(\'' + colId + '\',\'' + adId + '\')">🗑 Hapus</button>' +
         '</div>' +
         '<div class="note-editor" id="noteed_' + cardId + '">' +
