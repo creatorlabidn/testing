@@ -2485,10 +2485,7 @@
         <div class="stat-label">Active</div>
         <div class="stat-value green" id="statActive">0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Non Active</div>
-        <div class="stat-value red" id="statNonActive">0</div>
-      </div>
+
       <div class="stat-card">
         <div class="stat-label">Top Winning</div>
         <div class="stat-value red" id="statWinning">0</div>
@@ -2536,7 +2533,7 @@
         </select>
         <select id="filterStatus" onchange="applyFilters()">
           <option value="">Semua Status</option>
-          <option value="active">Aktif</option>
+          <option value="active" selected>Aktif</option>
           <option value="inactive">Tidak Aktif</option>
         </select>
         <select id="sortBy" onchange="applyFilters()">
