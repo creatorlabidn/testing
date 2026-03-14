@@ -2390,6 +2390,160 @@
     border-radius: 3px;
     transition: width 0.3s ease, background 0.3s ease;
   }
+
+  /* ─── SAVED COLLECTIONS ──────────────────────────────────── */
+  .btn-collection {
+    background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;
+    font-size: 10px; font-weight: 600; padding: 4px 9px; border-radius: 999px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+    white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;
+  }
+  .btn-collection:hover { background: #dcfce7; border-color: #16a34a; }
+  .btn-collection.in-collection { background: #dcfce7; border-color: #16a34a; font-weight: 700; }
+  .collection-dropdown-wrap { position: relative; }
+  .collection-dropdown {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    background: var(--bg); border: 1px solid var(--border2); border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 500;
+    min-width: 220px; max-width: 280px; overflow: hidden; display: none;
+    animation: fadeUp 0.15s ease both;
+  }
+  .collection-dropdown.open { display: block; }
+  .collection-dropdown-header {
+    padding: 10px 12px 8px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .collection-dropdown-list { max-height: 200px; overflow-y: auto; }
+  .collection-dropdown-item {
+    display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+    cursor: pointer; transition: background 0.1s; font-size: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .collection-dropdown-item:last-child { border-bottom: none; }
+  .collection-dropdown-item:hover { background: var(--surface2); }
+  .collection-dropdown-item.active-col { background: #f0fdf4; }
+  .collection-dropdown-icon { font-size: 16px; flex-shrink: 0; }
+  .collection-dropdown-name { flex: 1; font-weight: 600; color: var(--text); }
+  .collection-dropdown-count { font-size: 10px; color: var(--muted); flex-shrink: 0; }
+  .collection-dropdown-empty { padding: 14px 12px; font-size: 12px; color: var(--muted); text-align: center; }
+  .collection-dropdown-footer { padding: 8px 10px; border-top: 1px solid var(--border); background: var(--surface); }
+  .btn-new-collection-dd {
+    width: 100%; display: flex; align-items: center; gap: 6px;
+    background: var(--accent-soft); border: 1px dashed var(--accent-border);
+    color: var(--accent); font-size: 12px; font-weight: 600;
+    padding: 7px 10px; border-radius: 7px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+  .btn-new-collection-dd:hover { background: rgba(232,40,74,0.12); }
+  /* Collections Manager Modal */
+  .collections-modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(9,9,11,0.45); backdrop-filter: blur(8px);
+    z-index: 2000; align-items: center; justify-content: center; padding: 24px;
+  }
+  .collections-modal-bg.open { display: flex; }
+  .collections-modal {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 16px;
+    max-width: 900px; width: 100%; height: 85vh; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.14); animation: fadeUp 0.2s ease both;
+  }
+  .collections-modal-header {
+    padding: 15px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .collections-modal-title {
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px;
+    font-weight: 700; color: var(--text); letter-spacing: -0.4px; flex: 1;
+  }
+  .collections-layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+  .collections-sidebar {
+    width: 230px; flex-shrink: 0; border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; background: var(--surface);
+  }
+  .collections-sidebar-header {
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .collections-sidebar-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+  .btn-add-col {
+    background: var(--accent); border: none; color: #fff; font-size: 18px;
+    width: 24px; height: 24px; border-radius: 6px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+    transition: background 0.15s; font-family: sans-serif;
+  }
+  .btn-add-col:hover { background: #c91f3a; }
+  .collections-list-sidebar { flex: 1; overflow-y: auto; padding: 6px; }
+  .col-item {
+    display: flex; align-items: center; gap: 8px; padding: 9px 10px;
+    border-radius: 8px; cursor: pointer; transition: all 0.1s; margin-bottom: 2px;
+  }
+  .col-item:hover { background: var(--surface2); }
+  .col-item.active { background: var(--bg); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .col-item-icon { font-size: 18px; flex-shrink: 0; }
+  .col-item-info { flex: 1; min-width: 0; }
+  .col-item-name { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-item-count { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .col-item-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; opacity: 0; transition: opacity 0.15s; padding: 2px; font-family: sans-serif; flex-shrink: 0; }
+  .col-item:hover .col-item-del { opacity: 0.5; }
+  .col-item-del:hover { opacity: 1 !important; color: var(--accent); }
+  .col-empty-sidebar { padding: 20px 14px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+  /* New collection inline form */
+  .new-col-form { display: none; padding: 10px; border-top: 1px solid var(--border); background: var(--bg); flex-direction: column; gap: 6px; }
+  .new-col-form.open { display: flex; }
+  .emoji-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .emoji-opt { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 6px; cursor: pointer; border: 1.5px solid transparent; transition: all 0.1s; background: var(--surface2); }
+  .emoji-opt:hover { background: var(--surface); border-color: var(--border2); }
+  .emoji-opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .new-col-input { background: var(--bg); border: 1.5px solid var(--border2); border-radius: 7px; padding: 7px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif; outline: none; color: var(--text); width: 100%; }
+  .new-col-input:focus { border-color: var(--accent); }
+  .new-col-btns { display: flex; gap: 5px; }
+  .btn-create-col { flex: 1; background: var(--accent); border: none; color: #fff; font-size: 12px; font-weight: 700; padding: 7px; border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-create-col:hover { background: #c91f3a; }
+  .btn-cancel-col { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); font-size: 12px; padding: 7px 10px; border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  /* Content panel */
+  .collections-content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+  .col-content-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .col-content-icon { font-size: 22px; flex-shrink: 0; }
+  .col-content-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.3px; }
+  .col-content-meta { font-size: 11px; color: var(--muted); }
+  .btn-edit-col { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .btn-edit-col:hover { border-color: var(--text); color: var(--text); }
+  .btn-export-col { background: var(--text); border: none; color: #fff; font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; display: flex; align-items: center; gap: 4px; }
+  .btn-export-col:hover { background: var(--accent); }
+  .col-ads-grid { flex: 1; overflow-y: auto; padding: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; align-content: start; }
+  .col-ad-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: all 0.15s; animation: fadeUp 0.2s ease both; }
+  .col-ad-card:hover { border-color: var(--border2); box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
+  .col-ad-thumb { width: 100%; height: 110px; object-fit: cover; display: block; background: var(--surface2); }
+  .col-ad-thumb-ph { width: 100%; height: 110px; display: flex; align-items: center; justify-content: center; font-size: 26px; background: var(--surface2); opacity: 0.35; }
+  .col-ad-info { padding: 9px 11px; }
+  .col-ad-page { font-size: 11px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-ad-title { font-size: 11px; color: var(--muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; }
+  .col-ad-note { margin: 0 10px 8px; font-size: 11px; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 5px; padding: 5px 8px; line-height: 1.4; font-style: italic; }
+  .col-ad-actions { display: flex; gap: 5px; padding: 7px 9px; border-top: 1px solid var(--border); background: var(--surface); }
+  .btn-col-note { flex: 1; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 10px; font-weight: 600; padding: 5px 7px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-col-note:hover { background: #fef3c7; }
+  .btn-col-remove { background: #fef2f2; border: 1px solid rgba(232,40,74,0.2); color: var(--accent); font-size: 10px; font-weight: 600; padding: 5px 7px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-col-remove:hover { background: rgba(232,40,74,0.1); }
+  .note-editor { display: none; padding: 7px 9px; border-top: 1px solid #fde68a; background: #fffbeb; }
+  .note-editor.open { display: block; }
+  .note-ta { width: 100%; background: var(--bg); border: 1px solid #fde68a; border-radius: 5px; padding: 5px 8px; font-size: 11px; font-family: 'DM Sans', sans-serif; resize: none; outline: none; color: var(--text); min-height: 50px; }
+  .note-ta:focus { border-color: #f59e0b; }
+  .note-btns { display: flex; gap: 4px; margin-top: 4px; justify-content: flex-end; }
+  .btn-note-save { background: #f59e0b; border: none; color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-note-cancel { background: transparent; border: 1px solid var(--border2); color: var(--muted); font-size: 10px; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .col-empty-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); padding: 40px; text-align: center; }
+  .col-empty-content .e-icon { font-size: 40px; opacity: 0.25; }
+  .col-empty-content h4 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin: 0; }
+  .col-empty-content p { font-size: 12px; line-height: 1.6; max-width: 260px; margin: 0; }
+  .col-select-prompt { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); }
+  .col-select-prompt .e-icon { font-size: 40px; opacity: 0.2; }
+  /* Header button */
+  .btn-col-header { display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; position: relative; text-decoration: none; }
+  .btn-col-header:hover { background: #dcfce7; border-color: #16a34a; }
+  .col-header-badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px; display: none; align-items: center; justify-content: center; padding: 0 4px; }
+
 </style>
 </head>
 <body>
@@ -2416,6 +2570,10 @@
       </svg>
       Request Fitur
     </a>
+    <button class="btn-col-header" onclick="openCollections()" title="Saved Collections">
+      📁 Koleksi
+      <span class="col-header-badge" id="colHeaderBadge"></span>
+    </button>
     <button class="settings-btn" onclick="openSettings()" title="Settings">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7.5 9.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="1.3"/>
@@ -2680,7 +2838,51 @@
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
+<!-- COLLECTIONS MODAL -->
+<div class="collections-modal-bg" id="collectionsModalBg" onclick="closeCollectionsModal(event)">
+  <div class="collections-modal">
+    <div class="collections-modal-header">
+      <div class="collections-modal-title">📁 Saved Collections</div>
+      <button class="info-modal-close" onclick="closeCollectionsDirect()">&#10005;</button>
+    </div>
+    <div class="collections-layout">
+      <!-- Sidebar -->
+      <div class="collections-sidebar">
+        <div class="collections-sidebar-header">
+          <span class="collections-sidebar-label">Koleksi</span>
+          <button class="btn-add-col" onclick="toggleNewColForm()" title="Buat koleksi baru">+</button>
+        </div>
+        <div class="collections-list-sidebar" id="collectionsSidebarList"></div>
+        <!-- Form buat koleksi baru -->
+        <div class="new-col-form" id="newColForm">
+          <div class="emoji-row" id="emojiRow"></div>
+          <input type="text" class="new-col-input" id="newColName" placeholder="Nama koleksi..." maxlength="40"
+            onkeydown="if(event.key==='Enter')confirmCreateCollection()">
+          <div class="new-col-btns">
+            <button class="btn-create-col" onclick="confirmCreateCollection()">Buat</button>
+            <button class="btn-cancel-col" onclick="toggleNewColForm(false)">Batal</button>
+          </div>
+        </div>
+      </div>
+      <!-- Content panel -->
+      <div class="collections-content" id="collectionsContent">
+        <div class="col-select-prompt" id="colSelectPrompt">
+          <div class="e-icon">📂</div>
+          <p style="font-size:13px">Pilih koleksi di kiri<br>atau buat koleksi baru</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLECTION DROPDOWN (dibuat dinamis, di-append ke body) -->
+<div class="collection-dropdown" id="globalColDropdown">
+  <div class="collection-dropdown-header">Simpan ke Koleksi</div>
+  <div class="collection-dropdown-list" id="globalColDropdownList"></div>
+  <div class="collection-dropdown-footer">
+    <button class="btn-new-collection-dd" onclick="openNewColFromDropdown()">＋ Buat Koleksi Baru</button>
+  </div>
+</div>
 <div class="settings-modal-bg" id="settingsModalBg" onclick="closeSettingsModal(event)">
   <div class="settings-modal">
     <div class="settings-modal-header">
@@ -2971,8 +3173,9 @@
   (function init() {
     updateTokenChip();
 
-    // STEP 1: Load bookmark dulu (sinkron)
+    // STEP 1: Load bookmark & collections dulu (sinkron)
     loadBookmarks();
+    loadCollections();
 
     // STEP 2: Restore data iklan
     try {
@@ -3950,6 +4153,9 @@
             '<button class="btn-bookmark' + (isBookmarked ? ' bookmarked' : '') + '" onclick="toggleBookmark(\'' + adId + '\', this)" title="' + (isBookmarked ? 'Hapus bookmark' : 'Simpan bookmark') + '">' +
               (isBookmarked ? '🔖 Tersimpan' : '🔖 Simpan') +
             '</button>' +
+            '<div class="collection-dropdown-wrap" style="position:relative">' +
+              '<button class="btn-collection' + (getAdCollections(adId).length > 0 ? ' in-collection' : '') + '" data-col-btn-id="' + adId + '" onclick="toggleColDropdown(event,\'' + adId + '\')" title="Simpan ke koleksi">📁' + (getAdCollections(adId).length > 0 ? ' ' + getAdCollections(adId).length : '') + '</button>' +
+            '</div>' +
             '<button class="btn-hide-advertiser" data-hide-page-name="' + escHtml(ad.page_name || '') + '" data-hide-page-id="' + escHtml(ad.page_id || '') + '">🚫 Hide</button>' +
           '</div>' +
         '</div>' +
@@ -4206,6 +4412,456 @@
     setRunBtn(false, '&#9654;', 'Run Machine');
     try { localStorage.removeItem(LS_DATA); sessionStorage.removeItem(LS_DATA); } catch(e) {}
     showToast('Data dihapus');
+  }
+
+  // ─── SAVED COLLECTIONS ────────────────────────────────────────
+  // Struktur data koleksi di localStorage:
+  // LS_COLLECTIONS = JSON array of { id, name, icon, createdAt }
+  // LS_COL_ITEMS_PREFIX + colId = JSON array of { adId, note, addedAt }
+  // LS_COL_ADDATA_PREFIX + adId = slim ad object (untuk render tanpa allData)
+
+  const LS_COLLECTIONS       = 'adspy_collections';
+  const LS_COL_ITEMS_PREFIX  = 'adspy_col_items_';
+  const LS_COL_ADDATA_PREFIX = 'adspy_col_addata_';
+
+  const COL_EMOJIS = ['📁','⭐','🔥','💡','🎯','📌','🛒','📊','💰','🏆','🎬','🖼','📋','🔖','✅'];
+
+  let collections = [];          // array of {id, name, icon}
+  let activeColId = null;        // koleksi yang sedang dilihat di modal
+  let _colDropAdId = null;       // adId yang sedang di-hover dropdown
+  let _selectedEmoji = '📁';
+
+  function loadCollections() {
+    try {
+      const saved = store.get(LS_COLLECTIONS);
+      collections = saved ? JSON.parse(saved) : [];
+    } catch(e) { collections = []; }
+    updateColHeaderBadge();
+  }
+
+  function saveCollections() {
+    store.set(LS_COLLECTIONS, JSON.stringify(collections));
+    updateColHeaderBadge();
+  }
+
+  function getColItems(colId) {
+    try {
+      const v = store.get(LS_COL_ITEMS_PREFIX + colId);
+      return v ? JSON.parse(v) : [];
+    } catch(e) { return []; }
+  }
+
+  function saveColItems(colId, items) {
+    store.set(LS_COL_ITEMS_PREFIX + colId, JSON.stringify(items));
+  }
+
+  // Simpan slim ad data supaya bisa di-render di koleksi meski allData kosong
+  function saveAdToColCache(ad) {
+    try {
+      const key = LS_COL_ADDATA_PREFIX + String(ad.ad_archive_id);
+      if (!store.get(key)) {
+        store.set(key, JSON.stringify(buildSlimAd(ad)));
+      }
+    } catch(e) {}
+  }
+
+  function getAdFromColCache(adId) {
+    try {
+      const v = store.get(LS_COL_ADDATA_PREFIX + String(adId));
+      return v ? JSON.parse(v) : null;
+    } catch(e) { return null; }
+  }
+
+  // Cari koleksi mana saja yang mengandung adId
+  function getAdCollections(adId) {
+    adId = String(adId);
+    return collections.filter(col => {
+      const items = getColItems(col.id);
+      return items.some(i => String(i.adId) === adId);
+    });
+  }
+
+  function updateColHeaderBadge() {
+    const badge = document.getElementById('colHeaderBadge');
+    if (!badge) return;
+    const total = collections.reduce((sum, col) => sum + getColItems(col.id).length, 0);
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+  }
+
+  // ── Dropdown pilih koleksi di card ──────────────────────────
+  let _colDropListener = null;
+
+  function toggleColDropdown(e, adId) {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    const dropdown = document.getElementById('globalColDropdown');
+    const wrap = btn.closest('.collection-dropdown-wrap');
+
+    // Toggle: jika sudah open untuk adId yang sama → tutup
+    if (dropdown.classList.contains('open') && _colDropAdId === adId) {
+      closeColDropdown();
+      return;
+    }
+
+    _colDropAdId = adId;
+
+    // Posisikan dropdown di bawah tombol
+    const rect = btn.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = (rect.bottom + 6) + 'px';
+    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    dropdown.style.left = 'auto';
+
+    renderColDropdownList(adId);
+    dropdown.classList.add('open');
+
+    // Close on outside click
+    if (_colDropListener) document.removeEventListener('click', _colDropListener);
+    _colDropListener = function(ev) {
+      if (!dropdown.contains(ev.target) && ev.target !== btn) {
+        closeColDropdown();
+      }
+    };
+    setTimeout(() => document.addEventListener('click', _colDropListener), 10);
+  }
+
+  function closeColDropdown() {
+    document.getElementById('globalColDropdown').classList.remove('open');
+    _colDropAdId = null;
+    if (_colDropListener) {
+      document.removeEventListener('click', _colDropListener);
+      _colDropListener = null;
+    }
+  }
+
+  function renderColDropdownList(adId) {
+    adId = String(adId);
+    const listEl = document.getElementById('globalColDropdownList');
+    if (collections.length === 0) {
+      listEl.innerHTML = '<div class="collection-dropdown-empty">Belum ada koleksi.<br>Buat koleksi baru di bawah.</div>';
+      return;
+    }
+    listEl.innerHTML = collections.map(col => {
+      const items = getColItems(col.id);
+      const inCol = items.some(i => String(i.adId) === adId);
+      return '<div class="collection-dropdown-item' + (inCol ? ' active-col' : '') + '" onclick="toggleAdInCollection(\'' + adId + '\',\'' + col.id + '\')">' +
+        '<span class="collection-dropdown-icon">' + col.icon + '</span>' +
+        '<span class="collection-dropdown-name">' + escHtml(col.name) + '</span>' +
+        '<span class="collection-dropdown-count">' + items.length + ' iklan</span>' +
+        (inCol ? '<span class="collection-dropdown-check">✓</span>' : '') +
+        '</div>';
+    }).join('');
+  }
+
+  function openNewColFromDropdown() {
+    closeColDropdown();
+    openCollections();
+    setTimeout(() => toggleNewColForm(true), 200);
+  }
+
+  function toggleAdInCollection(adId, colId) {
+    adId = String(adId);
+    const items = getColItems(colId);
+    const idx = items.findIndex(i => String(i.adId) === adId);
+    const col = collections.find(c => c.id === colId);
+
+    if (idx >= 0) {
+      // Hapus dari koleksi
+      items.splice(idx, 1);
+      saveColItems(colId, items);
+      showToast('Dihapus dari ' + (col?.icon || '') + ' ' + (col?.name || 'koleksi'), false);
+    } else {
+      // Tambah ke koleksi — cari ad dari filteredData atau cache
+      const ad = filteredData.find(a => String(a.ad_archive_id) === adId)
+               || allData.find(a => String(a.ad_archive_id) === adId);
+      if (ad) saveAdToColCache(ad);
+      items.push({ adId, note: '', addedAt: Date.now() });
+      saveColItems(colId, items);
+      showToast('✓ Ditambah ke ' + (col?.icon || '') + ' ' + (col?.name || 'koleksi'), true);
+    }
+
+    // Update dropdown list
+    renderColDropdownList(adId);
+    // Update tombol di card
+    updateCardColBtn(adId);
+    updateColHeaderBadge();
+    // Refresh tampilan koleksi jika modal terbuka
+    if (activeColId === colId) renderColContent(colId);
+  }
+
+  function updateCardColBtn(adId) {
+    // Cari semua tombol koleksi dengan adId ini dan update tampilannya
+    const cols = getAdCollections(adId);
+    document.querySelectorAll('[data-col-btn-id="' + adId + '"]').forEach(btn => {
+      btn.className = 'btn-collection' + (cols.length > 0 ? ' in-collection' : '');
+      btn.textContent = '📁' + (cols.length > 0 ? ' ' + cols.length : '');
+    });
+  }
+
+  // ── Collections Manager Modal ────────────────────────────────
+  function openCollections() {
+    loadCollections();
+    document.getElementById('collectionsModalBg').classList.add('open');
+    document.body.classList.add('modal-open');
+    renderCollectionsSidebar();
+    // Pilih koleksi pertama otomatis jika ada
+    if (collections.length > 0 && !activeColId) {
+      selectCollection(collections[0].id);
+    } else if (activeColId) {
+      renderColContent(activeColId);
+    }
+  }
+
+  function closeCollectionsModal(e) {
+    if (e.target === document.getElementById('collectionsModalBg')) closeCollectionsDirect();
+  }
+
+  function closeCollectionsDirect() {
+    document.getElementById('collectionsModalBg').classList.remove('open');
+    if (!document.querySelector('.modal-bg.open, .info-modal-bg.open, .settings-modal-bg.open')) {
+      document.body.classList.remove('modal-open');
+    }
+  }
+
+  function renderCollectionsSidebar() {
+    const list = document.getElementById('collectionsSidebarList');
+    if (collections.length === 0) {
+      list.innerHTML = '<div class="col-empty-sidebar">Belum ada koleksi.<br>Klik <strong>+</strong> untuk membuat.</div>';
+      return;
+    }
+    list.innerHTML = collections.map(col => {
+      const count = getColItems(col.id).length;
+      return '<div class="col-item' + (activeColId === col.id ? ' active' : '') + '" onclick="selectCollection(\'' + col.id + '\')">' +
+        '<span class="col-item-icon">' + col.icon + '</span>' +
+        '<div class="col-item-info">' +
+          '<div class="col-item-name">' + escHtml(col.name) + '</div>' +
+          '<div class="col-item-count">' + count + ' iklan</div>' +
+        '</div>' +
+        '<button class="col-item-del" onclick="deleteCollection(event,\'' + col.id + '\')" title="Hapus koleksi">✕</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function selectCollection(colId) {
+    activeColId = colId;
+    renderCollectionsSidebar();
+    renderColContent(colId);
+  }
+
+  function renderColContent(colId) {
+    const col = collections.find(c => c.id === colId);
+    const contentEl = document.getElementById('collectionsContent');
+    if (!col) { contentEl.innerHTML = '<div class="col-select-prompt"><div class="e-icon">📂</div><p>Pilih koleksi di kiri</p></div>'; return; }
+
+    const items = getColItems(colId);
+
+    let headerHtml = '<div class="col-content-header">' +
+      '<span class="col-content-icon">' + col.icon + '</span>' +
+      '<span class="col-content-title">' + escHtml(col.name) + '</span>' +
+      '<span class="col-content-meta">' + items.length + ' iklan</span>' +
+      '<button class="btn-edit-col" onclick="renameCollection(\'' + colId + '\')">✏ Rename</button>' +
+      '<button class="btn-export-col" onclick="exportCollection(\'' + colId + '\')">↓ Export CSV</button>' +
+    '</div>';
+
+    if (items.length === 0) {
+      contentEl.innerHTML = headerHtml +
+        '<div class="col-empty-content">' +
+          '<div class="e-icon">📭</div>' +
+          '<h4>Koleksi kosong</h4>' +
+          '<p>Simpan iklan ke koleksi ini dengan klik tombol 📁 di kartu iklan.</p>' +
+        '</div>';
+      return;
+    }
+
+    const cardsHtml = items.map((item, i) => {
+      const adId = String(item.adId);
+      const ad = allData.find(a => String(a.ad_archive_id) === adId)
+               || filteredData.find(a => String(a.ad_archive_id) === adId)
+               || getAdFromColCache(adId);
+      if (!ad) return '';
+      const sn = ad.snapshot || {};
+      const thumb = sn.videos?.[0]?.video_preview_image_url
+        || sn.images?.[0]?.resized_image_url
+        || sn.cards?.[0]?.resized_image_url || '';
+      const rawTitle = sn.title || '';
+      const displayTitle = (isDpaTemplate(rawTitle) && sn.cards?.[0]?.title)
+        ? sn.cards[0].title : rawTitle;
+      const cardId = 'colcard_' + colId + '_' + i;
+
+      return '<div class="col-ad-card" id="' + cardId + '">' +
+        (thumb
+          ? '<img class="col-ad-thumb" src="' + escHtml(thumb) + '" onerror="this.className=\'col-ad-thumb-ph\';this.outerHTML=\'<div class=col-ad-thumb-ph>📋</div>\'">'
+          : '<div class="col-ad-thumb-ph">' + (getAdFormat(ad) === 'VIDEO' ? '🎬' : isDpa(ad) ? '🛒' : '🖼') + '</div>') +
+        '<div class="col-ad-info">' +
+          '<div class="col-ad-page">' + escHtml(ad.page_name || '—') + '</div>' +
+          '<div class="col-ad-title">' + escHtml(displayTitle || '(Tanpa Judul)') + '</div>' +
+        '</div>' +
+        (item.note ? '<div class="col-ad-note">' + escHtml(item.note) + '</div>' : '') +
+        '<div class="col-ad-actions">' +
+          '<button class="btn-col-note" onclick="toggleNoteEditor(\'' + cardId + '\',\'' + colId + '\',\'' + adId + '\')">📝 ' + (item.note ? 'Edit Catatan' : 'Tambah Catatan') + '</button>' +
+          '<button class="btn-col-remove" onclick="removeFromCollection(\'' + colId + '\',\'' + adId + '\')">🗑 Hapus</button>' +
+        '</div>' +
+        '<div class="note-editor" id="noteed_' + cardId + '">' +
+          '<textarea class="note-ta" id="noteta_' + cardId + '" placeholder="Tambahkan catatan untuk iklan ini...">' + escHtml(item.note || '') + '</textarea>' +
+          '<div class="note-btns">' +
+            '<button class="btn-note-cancel" onclick="toggleNoteEditor(\'' + cardId + '\',\'' + colId + '\',\'' + adId + '\')">Batal</button>' +
+            '<button class="btn-note-save" onclick="saveNote(\'' + colId + '\',\'' + adId + '\',\'' + cardId + '\')">Simpan</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).filter(Boolean).join('');
+
+    contentEl.innerHTML = headerHtml + '<div class="col-ads-grid">' + cardsHtml + '</div>';
+  }
+
+  function toggleNoteEditor(cardId, colId, adId) {
+    const ed = document.getElementById('noteed_' + cardId);
+    if (!ed) return;
+    ed.classList.toggle('open');
+    if (ed.classList.contains('open')) {
+      document.getElementById('noteta_' + cardId)?.focus();
+    }
+  }
+
+  function saveNote(colId, adId, cardId) {
+    adId = String(adId);
+    const ta = document.getElementById('noteta_' + cardId);
+    if (!ta) return;
+    const note = ta.value.trim();
+    const items = getColItems(colId);
+    const item = items.find(i => String(i.adId) === adId);
+    if (item) {
+      item.note = note;
+      saveColItems(colId, items);
+      showToast('✓ Catatan disimpan', true);
+      renderColContent(colId);
+    }
+  }
+
+  function removeFromCollection(colId, adId) {
+    adId = String(adId);
+    const items = getColItems(colId).filter(i => String(i.adId) !== adId);
+    saveColItems(colId, items);
+    updateCardColBtn(adId);
+    updateColHeaderBadge();
+    renderCollectionsSidebar();
+    renderColContent(colId);
+    showToast('Iklan dihapus dari koleksi', false);
+  }
+
+  function deleteCollection(e, colId) {
+    e.stopPropagation();
+    const col = collections.find(c => c.id === colId);
+    if (!confirm('Hapus koleksi "' + (col?.name || '') + '"? Semua iklan di dalamnya akan dihapus dari koleksi ini.')) return;
+    collections = collections.filter(c => c.id !== colId);
+    saveCollections();
+    store.remove(LS_COL_ITEMS_PREFIX + colId);
+    if (activeColId === colId) {
+      activeColId = collections.length > 0 ? collections[0].id : null;
+    }
+    renderCollectionsSidebar();
+    if (activeColId) renderColContent(activeColId);
+    else document.getElementById('collectionsContent').innerHTML = '<div class="col-select-prompt"><div class="e-icon">📂</div><p>Pilih koleksi di kiri</p></div>';
+    showToast('Koleksi dihapus', false);
+  }
+
+  function renameCollection(colId) {
+    const col = collections.find(c => c.id === colId);
+    if (!col) return;
+    const newName = prompt('Nama baru untuk koleksi:', col.name);
+    if (!newName || !newName.trim()) return;
+    col.name = newName.trim();
+    saveCollections();
+    renderCollectionsSidebar();
+    renderColContent(colId);
+  }
+
+  function exportCollection(colId) {
+    const col = collections.find(c => c.id === colId);
+    const items = getColItems(colId);
+    if (!items.length) { showToast('Koleksi kosong!'); return; }
+
+    const headers = ['No','Ad Archive ID','Page Name','Format','Title','Body','Link URL','CTA','Start Date','End Date','Winning Score','Platform','Catatan','Ditambahkan'];
+    const rows = items.map((item, i) => {
+      const adId = String(item.adId);
+      const ad = allData.find(a => String(a.ad_archive_id) === adId)
+               || filteredData.find(a => String(a.ad_archive_id) === adId)
+               || getAdFromColCache(adId) || {};
+      const sn = ad.snapshot || {};
+      const rawTitle = sn.title || '';
+      const title = (isDpaTemplate(rawTitle) && sn.cards?.[0]?.title) ? sn.cards[0].title : rawTitle;
+      return [
+        i+1, adId,
+        '"' + (ad.page_name||'').replace(/"/g,'""') + '"',
+        getAdFormat(ad),
+        '"' + title.replace(/"/g,'""') + '"',
+        '"' + (sn.body?.text||'').substring(0,100).replace(/\n/g,' ').replace(/"/g,'""') + '"',
+        '"' + (sn.link_url||'') + '"',
+        '"' + (sn.cta_text||'') + '"',
+        ad.start_date ? new Date(ad.start_date*1000).toLocaleDateString('id-ID') : '',
+        ad.end_date ? new Date(ad.end_date*1000).toLocaleDateString('id-ID') : '',
+        calcWinningScore(ad),
+        '"' + (ad.publisher_platform||[]).join('|') + '"',
+        '"' + (item.note||'').replace(/"/g,'""') + '"',
+        new Date(item.addedAt).toLocaleDateString('id-ID')
+      ].join(',');
+    });
+
+    const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'koleksi_' + (col?.name||'export').replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('✓ Export ' + items.length + ' iklan berhasil!', true);
+  }
+
+  // ── Buat koleksi baru ────────────────────────────────────────
+  function toggleNewColForm(forceOpen) {
+    const form = document.getElementById('newColForm');
+    const shouldOpen = forceOpen !== undefined ? forceOpen : !form.classList.contains('open');
+    form.classList.toggle('open', shouldOpen);
+    if (shouldOpen) {
+      buildEmojiPicker();
+      document.getElementById('newColName').focus();
+    }
+  }
+
+  function buildEmojiPicker() {
+    const row = document.getElementById('emojiRow');
+    if (!row) return;
+    row.innerHTML = COL_EMOJIS.map(e =>
+      '<div class="emoji-opt' + (e === _selectedEmoji ? ' selected' : '') + '" onclick="selectEmoji(\'' + e + '\')">' + e + '</div>'
+    ).join('');
+  }
+
+  function selectEmoji(emoji) {
+    _selectedEmoji = emoji;
+    document.querySelectorAll('.emoji-opt').forEach(el => {
+      el.classList.toggle('selected', el.textContent === emoji);
+    });
+  }
+
+  function confirmCreateCollection() {
+    const name = document.getElementById('newColName').value.trim();
+    if (!name) { document.getElementById('newColName').focus(); return; }
+    const col = {
+      id: 'col_' + Date.now(),
+      name,
+      icon: _selectedEmoji,
+      createdAt: Date.now()
+    };
+    collections.push(col);
+    saveCollections();
+    saveColItems(col.id, []);
+    toggleNewColForm(false);
+    document.getElementById('newColName').value = '';
+    _selectedEmoji = '📁';
+    renderCollectionsSidebar();
+    selectCollection(col.id);
+    showToast('✓ Koleksi "' + name + '" dibuat!', true);
   }
 </script>
 </body>
