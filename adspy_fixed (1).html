@@ -1,0 +1,4215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdSpy — FB Ads Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #fafafa;
+    --surface2: #f4f4f5;
+    --border: #e4e4e7;
+    --border2: #d4d4d8;
+    --accent: #e8284a;
+    --accent-soft: rgba(232,40,74,0.08);
+    --accent-border: rgba(232,40,74,0.2);
+    --accent2: #18181b;
+    --muted: #71717a;
+    --text: #09090b;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --card-shadow-hover: 0 8px 24px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    user-select: none;
+  }
+
+  .logo-ad { color: var(--text); }
+  .logo-spy { color: var(--accent); }
+
+  .header-badge {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 14px;
+    letter-spacing: 0.2px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .wrapper {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+
+  .hero {
+    padding: 52px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .hero-label::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 480px;
+  }
+
+  .scraper-panel {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .scraper-panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--bg);
+  }
+
+  .scraper-panel-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.3px;
+  }
+
+  .scraper-badge {
+    font-size: 10px;
+    font-weight: 600;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+
+  .scraper-body {
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  @media (max-width: 900px) {
+    .scraper-body { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .scraper-body { grid-template-columns: 1fr; }
+  }
+
+  .scraper-field { display: flex; flex-direction: column; gap: 5px; }
+
+  .scraper-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--muted);
+  }
+
+  .scraper-input {
+    background: var(--bg);
+    border: 1.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 9px 13px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .scraper-input:focus { border-color: var(--accent); }
+  .scraper-input::placeholder { color: var(--muted); font-size: 12px; }
+
+  .scraper-input.mono {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: -0.2px;
+  }
+
+  .scraper-run-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+    height: 40px;
+  }
+
+  .scraper-run-btn:hover:not(:disabled) { background: #c91f3a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,40,74,0.3); }
+  .scraper-run-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .scraper-advanced-row {
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: var(--surface2);
+  }
+
+  .scraper-adv-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .scraper-adv-fields {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+    align-items: center;
+  }
+
+  .scraper-adv-field {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .scraper-adv-field label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  .scraper-adv-select, .scraper-adv-number {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+
+  .scraper-adv-number { width: 70px; }
+
+  .scraper-status {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--bg);
+  }
+
+  .scraper-status.visible { display: flex; }
+
+  .scraper-status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .scraper-status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-running { background: #f59e0b; animation: pulse 1.2s infinite; }
+  .dot-success { background: #16a34a; }
+  .dot-error   { background: var(--accent); }
+
+  .scraper-status-text { color: var(--text); font-weight: 500; flex: 1; }
+  .scraper-status-sub  { font-size: 11px; color: var(--muted); }
+
+  .scraper-progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .scraper-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+
+  @keyframes progress-indeterminate {
+    0%   { transform: translateX(-100%); width: 60%; }
+    100% { transform: translateX(200%); width: 60%; }
+  }
+
+  .scraper-progress-fill.indeterminate {
+    width: 60% !important;
+    animation: progress-indeterminate 1.4s ease-in-out infinite;
+  }
+
+  .scraper-log {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    line-height: 1.7;
+    max-height: 80px;
+    overflow-y: auto;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 12px;
+    display: none;
+  }
+
+  .scraper-log.visible { display: block; }
+
+  .token-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 999px;
+    transition: all 0.2s;
+  }
+
+  .token-status-chip.ok    { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .token-status-chip.warn  { background: #fef2f2; color: var(--accent); border: 1px solid rgba(232,40,74,0.2); cursor: pointer; }
+  .token-status-chip.empty { display: none; }
+
+  .settings-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .settings-btn:hover { border-color: var(--text); color: var(--text); background: var(--surface); }
+
+  .settings-modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(9,9,11,0.45);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .settings-modal-bg.open { display: flex; }
+
+  .settings-modal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 88vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.06);
+    animation: fadeUp 0.2s ease both;
+  }
+
+  .settings-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .settings-modal-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .settings-modal-body {
+    overflow-y: auto;
+    padding: 0;
+    flex: 1;
+  }
+
+  .settings-section {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-section:last-child { border-bottom: none; }
+
+  .settings-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+
+  .settings-section-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .settings-token-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .settings-token-field {
+    flex: 1;
+    position: relative;
+  }
+
+  .settings-token-field .scraper-input {
+    padding-right: 38px;
+  }
+
+  .token-eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+  }
+
+  .token-eye-btn:hover { color: var(--text); }
+
+  .settings-save-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .settings-save-btn:hover { background: #c91f3a; }
+  .settings-save-btn.saved { background: #16a34a; }
+
+  .settings-token-status {
+    font-size: 11px;
+    margin-top: 7px;
+    min-height: 16px;
+    font-weight: 500;
+  }
+
+  .settings-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .settings-hint a { color: #7c3aed; text-decoration: none; }
+  .settings-hint a:hover { text-decoration: underline; }
+
+  .url-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .url-history-empty {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 10px 0;
+    font-style: italic;
+  }
+
+  .url-history-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .url-history-item:hover { border-color: var(--accent); }
+  .url-history-item:hover .url-history-text { color: var(--accent); }
+
+  .url-history-text {
+    flex: 1;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.15s;
+  }
+
+  .url-history-meta {
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .url-history-del {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 2px;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+    font-family: sans-serif;
+    flex-shrink: 0;
+  }
+
+  .url-history-del:hover { opacity: 1; color: var(--accent); }
+
+  .settings-clear-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .settings-clear-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .settings-danger { background: #fef2f2; }
+
+  .settings-danger-btn {
+    background: transparent;
+    border: 1px solid rgba(232,40,74,0.3);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .settings-danger-btn:hover { background: rgba(232,40,74,0.08); }
+
+  .btn-upload:hover { background: var(--accent); }
+  #fileInput { display: none; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #c91f3a; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    padding: 7px 13px;
+  }
+
+  .btn-danger:hover { border-color: var(--accent); color: var(--accent); }
+
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -1px;
+  }
+
+  .stat-value.red { color: var(--accent); }
+  .stat-value.green { color: #16a34a; }
+  .stat-value.purple { color: #7c3aed; }
+  .stat-value.amber { color: #d97706; }
+  .stat-value.teal { color: #0891b2; }
+
+  .filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .filter-bar-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 220px;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 14px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.15s;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  select {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.15s;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  .filter-count {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    white-space: nowrap;
+    margin-left: auto;
+  }
+
+  .btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--text);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-export:hover { background: var(--accent); transform: translateY(-1px); }
+
+  .exclude-panel {
+    background: #fef2f2;
+    border: 1px solid rgba(232,40,74,0.18);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .exclude-panel.has-items { display: block; }
+
+  .exclude-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .exclude-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .exclude-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .exclude-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #fff;
+    border: 1px solid rgba(232,40,74,0.3);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    animation: fadeUp 0.2s ease both;
+  }
+
+  .exclude-tag-remove {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+    font-family: sans-serif;
+  }
+
+  .exclude-tag-remove:hover { opacity: 1; }
+
+  .exclude-tag-url {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #eff6ff;
+    border: 1px solid rgba(29,78,216,0.25);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1d4ed8;
+    animation: fadeUp 0.2s ease both;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .exclude-tag-url-remove {
+    background: none;
+    border: none;
+    color: #1d4ed8;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+    font-family: sans-serif;
+  }
+
+  .exclude-tag-url-remove:hover { opacity: 1; }
+
+  .btn-clear-exclude {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(232,40,74,0.3);
+    background: transparent;
+    color: var(--accent);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+    margin-left: auto;
+  }
+
+  .btn-clear-exclude:hover { background: rgba(232,40,74,0.08); }
+
+  .exclude-search-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .exclude-input {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 14px 8px 32px;
+    color: var(--text);
+    font-size: 12px;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.15s;
+    width: 220px;
+  }
+
+  .exclude-input:focus { border-color: var(--accent); }
+  .exclude-input::placeholder { color: var(--muted); }
+
+  .exclude-input-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .exclude-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    z-index: 200;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+  }
+
+  .exclude-dropdown.open { display: block; }
+
+  .exclude-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .exclude-dropdown-item:last-child { border-bottom: none; }
+  .exclude-dropdown-item:hover { background: var(--surface2); }
+
+  .exclude-dropdown-item.already-excluded {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .exclude-dropdown-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .exclude-dropdown-name {
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .exclude-dropdown-count {
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .exclude-dropdown-empty {
+    padding: 14px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .btn-hide-advertiser {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .btn-hide-advertiser:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .winning-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+
+  .winning-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .winning-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .winning-toggles {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .toggle-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    background: var(--bg);
+    color: var(--muted);
+    transition: all 0.15s;
+    user-select: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .toggle-pill input { display: none; }
+
+  .toggle-pill:has(input:checked) {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+    color: var(--accent);
+  }
+
+  #filterBookmarkPill:has(input:checked) {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    color: #92400e;
+  }
+
+  .winning-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .badge-ws {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0;
+  }
+
+  .badge-high { background: #fef2f2; color: var(--accent); border: 1px solid rgba(232,40,74,0.2); }
+  .badge-mid  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .badge-low  { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .badge-tag {
+    display: inline-flex;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tag-trend { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .tag-scale { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+  .ads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 14px;
+  }
+
+  .ad-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    animation: fadeUp 0.35s ease both;
+    box-shadow: var(--card-shadow);
+  }
+
+  .ad-card:hover {
+    border-color: var(--border2);
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ad-card-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .page-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--surface2);
+  }
+
+  .page-info { flex: 1; min-width: 0; }
+
+  .page-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .page-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  .ad-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .status-active {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+  }
+
+  .status-inactive {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+  }
+
+  .status-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .ad-card-badges {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    align-items: center;
+  }
+
+  .ws-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .ws-high { background: #fef2f2; color: var(--accent); border: 1px solid rgba(232,40,74,0.2); }
+  .ws-mid  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .ws-low  { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .pill-trend { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .pill-scale { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .pill-platform { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .pill-dpa { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+
+  .like-count { font-size: 10px; color: var(--muted); margin-left: auto; }
+  .like-count span { color: var(--accent); font-weight: 600; }
+
+  .ad-preview {
+    position: relative;
+    height: 170px;
+    background: var(--surface2);
+    overflow: hidden;
+  }
+
+  .ad-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .ad-preview-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    opacity: 0.3;
+  }
+
+  .ad-preview-dpa {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #fdf4ff 0%, #f5f3ff 100%);
+  }
+
+  .ad-preview-dpa .dpa-icon { font-size: 32px; opacity: 0.6; }
+  .ad-preview-dpa .dpa-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7e22ce;
+    background: #e9d5ff;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+  .ad-preview-dpa .dpa-sub {
+    font-size: 10px;
+    color: #a78bfa;
+    font-weight: 400;
+  }
+
+  .ad-format-badge {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: rgba(9,9,11,0.75);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .ad-format-badge.badge-dpa {
+    background: rgba(126,34,206,0.85);
+  }
+
+  .ad-content { padding: 14px 16px 12px; }
+
+  .ad-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 7px;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    letter-spacing: -0.2px;
+  }
+
+  .ad-title.dpa-template {
+    color: #7e22ce;
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  .ad-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .ad-link {
+    font-size: 11px;
+    color: #7c3aed;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .ad-link:hover { text-decoration: underline; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: 500;
+  }
+
+  .tag.platform {
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+    color: #7c3aed;
+  }
+
+  .tag.cta {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+    color: var(--accent);
+  }
+
+  .ad-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .date-range {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .date-range strong { color: var(--text); font-weight: 600; display: block; font-size: 12px; }
+
+  .ad-id {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+
+  .ad-id:hover { border-color: var(--accent); color: var(--accent); }
+
+  .ad-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+
+  .btn-konten {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+  }
+  .btn-konten:hover { background: rgba(232,40,74,0.14); transform: translateY(-1px); }
+
+  .btn-landing {
+    background: #f5f3ff;
+    color: #7c3aed;
+    border: 1px solid #ddd6fe;
+  }
+  .btn-landing:hover { background: #ede9fe; transform: translateY(-1px); }
+
+  .btn-adlib {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+  }
+  .btn-adlib:hover { background: #ffedd5; transform: translateY(-1px); }
+
+  .btn-fbpage {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+  }
+  .btn-fbpage:hover { background: #dbeafe; transform: translateY(-1px); }
+
+  .btn-bookmark {
+    background: #fafafa;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .btn-bookmark:hover {
+    border-color: #f59e0b;
+    color: #f59e0b;
+    background: #fffbeb;
+  }
+
+  .btn-bookmark.bookmarked {
+    border-color: #f59e0b;
+    color: #f59e0b;
+    background: #fffbeb;
+  }
+
+  .btn-bookmark.bookmarked:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: #fef2f2;
+  }
+
+  .bookmark-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0 5px;
+    margin-left: 2px;
+    line-height: 1;
+  }
+
+  .ad-expand-btn {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 9px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  .ad-expand-btn:hover { background: var(--surface2); color: var(--text); }
+
+  .ad-detail { display: none; padding: 14px 16px; border-top: 1px solid var(--border); background: var(--surface); }
+  .ad-detail.open { display: block; }
+
+  .detail-row {
+    display: flex;
+    margin-bottom: 7px;
+    gap: 10px;
+    font-size: 12px;
+    align-items: flex-start;
+  }
+
+  .detail-key {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    min-width: 110px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .detail-val { color: var(--text); line-height: 1.5; word-break: break-word; font-size: 12px; }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 32px;
+    color: var(--muted);
+  }
+
+  .empty-state .empty-icon { font-size: 52px; margin-bottom: 20px; display: block; opacity: 0.4; }
+  .empty-state h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; color: var(--text); margin-bottom: 10px; font-weight: 700; letter-spacing: -0.5px; }
+  .empty-state p { font-size: 14px; max-width: 380px; margin: 0 auto; line-height: 1.6; }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .page-btn {
+    padding: 7px 13px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .page-btn:hover, .page-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+    max-width: 320px;
+    display: none;
+    animation: slideIn 0.25s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  @keyframes slideIn {
+    from { transform: translateY(16px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(9,9,11,0.4);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  .modal-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .modal-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .modal-close {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: var(--text); border-color: var(--border2); }
+
+  .modal-body {
+    overflow-y: auto;
+    padding: 18px;
+    flex: 1;
+  }
+
+  pre {
+    font-family: 'DM Mono', 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--surface);
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .modal-wide { max-width: 820px; }
+
+  .content-modal-body {
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .media-preview-wrap {
+    position: relative;
+    background: #09090b;
+    border-bottom: 1px solid var(--border);
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .media-preview-wrap img {
+    max-width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .video-thumb-wrap { position: relative; width: 100%; cursor: pointer; }
+  .video-thumb-wrap img { width: 100%; max-height: 360px; object-fit: cover; }
+
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.35);
+    transition: background 0.2s;
+  }
+
+  .play-overlay:hover { background: rgba(0,0,0,0.5); }
+
+  .play-btn {
+    width: 58px; height: 58px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: transform 0.2s;
+  }
+
+  .play-overlay:hover .play-btn { transform: scale(1.08); }
+
+  .video-player-wrap { width: 100%; }
+  .video-player-wrap video { width: 100%; max-height: 380px; display: block; background: #000; }
+
+  .media-placeholder-big { font-size: 56px; opacity: 0.2; }
+
+  .content-text-area { padding: 18px 22px; }
+
+  .content-page-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .content-page-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .content-page-name { font-family: 'Bricolage Grotesque', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+  .content-page-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .content-ad-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+  }
+
+  .content-ad-body {
+    font-size: 13px;
+    color: #3f3f46;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    margin-bottom: 16px;
+  }
+
+  .content-caption {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: var(--accent-soft);
+    border-radius: 7px;
+    border-left: 2.5px solid var(--accent);
+  }
+
+  .content-link-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    margin-bottom: 14px;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+
+  .content-link-box:hover { border-color: var(--border2); }
+  .content-link-icon { font-size: 22px; flex-shrink: 0; }
+  .content-link-info { flex: 1; min-width: 0; }
+
+  .content-link-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .content-link-url {
+    font-size: 11px;
+    color: #7c3aed;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .content-cta-btn {
+    flex-shrink: 0;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .content-meta-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .chip-green { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .chip-blue { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .chip-orange { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .chip-gray { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .chip-purple { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+  .carousel-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    scrollbar-width: thin;
+  }
+
+  .carousel-item {
+    flex-shrink: 0;
+    width: 130px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .carousel-item:hover { border-color: var(--accent); }
+  .carousel-item img { width: 100%; height: 84px; object-fit: cover; }
+
+  .carousel-item-label {
+    padding: 5px 8px;
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+  }
+
+  .landing-frame-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .landing-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .url-bar {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 11px;
+    color: var(--text);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .landing-btn {
+    padding: 7px 13px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .landing-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .landing-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .landing-btn.primary:hover { background: #c91f3a; color: #fff; }
+
+  .iframe-container { flex: 1; position: relative; min-height: 0; }
+  .iframe-container iframe { width: 100%; height: 100%; border: none; display: block; }
+
+  .iframe-blocker {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 32px;
+    text-align: center;
+  }
+
+  .iframe-blocker-icon { font-size: 44px; opacity: 0.5; }
+  .iframe-blocker h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin: 0; letter-spacing: -0.5px; }
+  .iframe-blocker p { font-size: 13px; color: var(--muted); max-width: 360px; line-height: 1.6; margin: 0; }
+
+  .iframe-blocker .url-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #7c3aed;
+    max-width: 480px;
+    word-break: break-all;
+    width: 100%;
+  }
+
+  .btn-open-external {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--accent);
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 9px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-open-external:hover { background: #c91f3a; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,40,74,0.25); }
+
+  .btn-copy-url {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: var(--muted);
+    padding: 9px 18px;
+    border-radius: 9px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-copy-url:hover { color: var(--text); border-color: var(--border2); }
+
+  #contentModalBg .modal,
+  #landingModalBg .modal {
+    max-width: 840px;
+    height: 85vh;
+  }
+
+  #landingModalBg .modal { max-width: 960px; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+
+  body.modal-open { overflow: hidden; }
+
+  @media (max-width: 600px) {
+    .ads-grid { grid-template-columns: 1fr; }
+    .filter-bar { flex-direction: column; align-items: stretch; }
+    .filter-bar-row { flex-direction: column; align-items: stretch; }
+    .exclude-input { width: 100%; }
+    header { padding: 0 16px; }
+    .wrapper { padding: 0 16px 60px; }
+    h1 { font-size: 30px; }
+  }
+
+  .info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px solid var(--border2);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    line-height: 1;
+    padding: 0;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  .info-btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .info-modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(9,9,11,0.45);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .info-modal-bg.open { display: flex; }
+
+  .info-modal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.06);
+    animation: fadeUp 0.2s ease both;
+  }
+
+  .info-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .info-modal-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .info-modal-icon.winning { background: #fef2f2; }
+  .info-modal-icon.trending { background: #fff7ed; }
+  .info-modal-icon.scale { background: #f5f3ff; }
+  .info-modal-icon.dpa { background: #fdf4ff; }
+
+  .info-modal-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.4px;
+    flex: 1;
+  }
+
+  .info-modal-close {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 9px;
+    border-radius: 7px;
+    transition: all 0.15s;
+    line-height: 1;
+    font-family: sans-serif;
+  }
+
+  .info-modal-close:hover { color: var(--text); border-color: var(--border2); }
+
+  .info-modal-body {
+    overflow-y: auto;
+    padding: 18px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .info-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 13px 15px;
+  }
+
+  .info-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .formula-eq {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+  }
+
+  .fp {
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .fp-duration { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .fp-scale    { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .fp-active   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .fp-dpa      { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+  .fp-op       { color: var(--muted); font-weight: 400; font-family: 'DM Sans', sans-serif; font-size: 14px; }
+  .fp-max      { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+
+  .score-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 9px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .score-table th {
+    background: var(--surface2);
+    padding: 7px 11px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .score-table td {
+    padding: 8px 11px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    line-height: 1.4;
+    font-size: 12px;
+  }
+
+  .score-table tr:last-child td { border-bottom: none; }
+  .score-table tr:hover td { background: var(--surface); }
+
+  .score-table .pts {
+    font-weight: 700;
+    text-align: right;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 15px;
+    width: 52px;
+  }
+
+  .pts-high { color: var(--accent); }
+  .pts-mid  { color: #1d4ed8; }
+  .pts-low  { color: var(--muted); }
+
+  .live-calc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .calc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .calc-label {
+    min-width: 120px;
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .calc-slider {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .calc-val {
+    min-width: 44px;
+    text-align: right;
+    font-weight: 700;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .calc-check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .calc-check { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+
+  .calc-result {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .calc-score-big {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .calc-meta { flex: 1; }
+  .calc-tier { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .calc-breakdown { font-size: 11px; color: var(--muted); line-height: 1.7; font-family: 'DM Mono', monospace; }
+
+  .score-bar-wrap {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-ad">Ad</span><span class="logo-spy">Spy</span>
+    <span style="font-size:13px;font-weight:500;color:var(--muted);margin-left:8px;letter-spacing:0;">by Creator</span><span style="font-size:13px;font-weight:700;color:#f97316;letter-spacing:0;">Lab</span><span style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:0;"> ID</span>
+  </div>
+  <div class="header-right">
+    <span class="header-source" id="dataSource"></span>
+    <a href="https://www.instagram.com/creatorlab.idn" target="_blank" rel="noopener" class="settings-btn" style="text-decoration:none;background:linear-gradient(135deg,#fdf4ff,#fff0fa);border-color:#e9d5ff;color:#c026d3;" title="Follow kami di Instagram">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+      Follow
+    </a>
+    <a href="https://wa.me/6285845435110?text=Request%20Fitur%20AdSpy%3A%20" target="_blank" rel="noopener" class="settings-btn" style="text-decoration:none;background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;" title="Request Fitur via WhatsApp">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.134.558 4.136 1.535 5.874L0 24l6.29-1.51A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.956 0-3.784-.535-5.348-1.464l-.383-.229-3.732.896.944-3.617-.252-.395A9.936 9.936 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+      </svg>
+      Request Fitur
+    </a>
+    <button class="settings-btn" onclick="openSettings()" title="Settings">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.5 9.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M12.2 9.2a.9.9 0 0 0 .18 1l.65.65a.5.5 0 0 1 0 .7l-.7.7a.5.5 0 0 1-.7 0l-.65-.65a.9.9 0 0 0-1-.18.9.9 0 0 0-.55.83V13a.5.5 0 0 1-.5.5h-1A.5.5 0 0 1 9 13v-.75a.9.9 0 0 0-.55-.83.9.9 0 0 0-1 .18l-.65.65a.5.5 0 0 1-.7 0l-.7-.7a.5.5 0 0 1 0-.7l.65-.65a.9.9 0 0 0 .18-1 .9.9 0 0 0-.83-.54H4.5a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h.75a.9.9 0 0 0 .83-.55.9.9 0 0 0-.18-1l-.65-.65a.5.5 0 0 1 0-.7l.7-.7a.5.5 0 0 1 .7 0l.65.65a.9.9 0 0 0 1 .18.9.9 0 0 0 .55-.83V2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v.75a.9.9 0 0 0 .55.83.9.9 0 0 0 1-.18l.65-.65a.5.5 0 0 1 .7 0l.7.7a.5.5 0 0 1 0 .7l-.65.65a.9.9 0 0 0-.18 1 .9.9 0 0 0 .83.55h.75a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-.75a.9.9 0 0 0-.83.55Z" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+      Settings
+    </button>
+    <span class="header-badge">FB Ads Intelligence v1.2</span>
+  </div>
+</header>
+
+<div class="wrapper">
+
+  <div class="hero">
+    <h1>Temukan Iklan <span>Winning</span></h1>
+    <p class="hero-sub">Analisis iklan Facebook berdasarkan durasi aktif, platform, dan skor winning score. Mendukung format VIDEO, IMAGE, CAROUSEL, DPA, dan SHOPPING.</p>
+  </div>
+
+  <div class="scraper-panel">
+    <div class="scraper-panel-header">
+      <div class="hero-label" style="margin:0">Facebook Ad Library</div>
+    </div>
+
+    <div class="scraper-body">
+      <div class="scraper-field" style="grid-column: 1 / -1; max-width: none;">
+        <span class="scraper-label">Ads Library URL</span>
+        <input type="text" class="scraper-input" id="apifyUrl"
+          placeholder="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ID&q=...">
+      </div>
+    </div>
+
+    <div class="scraper-advanced-row">
+      <span class="scraper-adv-label">Opsi</span>
+      <div class="scraper-adv-fields">
+        <div class="scraper-adv-field">
+          <label>Jumlah Ads</label>
+          <input type="number" class="scraper-adv-number" id="apifyCount" value="100" min="1" max="1000">
+        </div>
+        <button class="scraper-run-btn" id="runBtn" onclick="runApifyScraper()">
+          <span id="runBtnIcon">&#9654;</span>
+          <span id="runBtnText">Run Machine</span>
+        </button>
+        <span id="tokenStatusChip" class="token-status-chip"></span>
+      </div>
+    </div>
+
+    <div class="scraper-status" id="scraperStatus">
+      <div class="scraper-status-row">
+        <div class="scraper-status-dot" id="scraperDot"></div>
+        <span class="scraper-status-text" id="scraperStatusText">—</span>
+        <span class="scraper-status-sub" id="scraperStatusSub"></span>
+        <button id="scraperCancelBtn" onclick="cancelScraper()" style="display:none;background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:11px;padding:3px 10px;border-radius:5px;cursor:pointer;font-family:'DM Sans',sans-serif">Batal</button>
+      </div>
+      <div class="scraper-progress-bar"><div class="scraper-progress-fill" id="scraperProgressFill"></div></div>
+      <div class="scraper-log" id="scraperLog"></div>
+    </div>
+
+  </div>
+
+  <div id="statsSection" style="display:none">
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-label">Total Ads</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active</div>
+        <div class="stat-value green" id="statActive">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Non Active</div>
+        <div class="stat-value red" id="statNonActive">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Top Winning</div>
+        <div class="stat-value red" id="statWinning">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Trending</div>
+        <div class="stat-value amber" id="statTrending">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Scale / Duplikat</div>
+        <div class="stat-value purple" id="statDuplicate">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">DPA / Shopping</div>
+        <div class="stat-value teal" id="statDpa">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pages</div>
+        <div class="stat-value" id="statPages">0</div>
+      </div>
+      <div class="stat-card" style="border-color:#fde68a;background:#fffbeb;" id="statBookmarkCard">
+        <div class="stat-label" style="color:#92400e;">Bookmarked</div>
+        <div class="stat-value" style="color:#f59e0b;" id="statBookmark">0</div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-bar-row">
+        <input type="text" class="search-input" id="searchInput" placeholder="Cari nama page, judul iklan, body teks..." oninput="applyFilters()">
+        <select id="filterPlatform" onchange="applyFilters()">
+          <option value="">Semua Platform</option>
+          <option value="FACEBOOK">Facebook</option>
+          <option value="INSTAGRAM">Instagram</option>
+          <option value="MESSENGER">Messenger</option>
+          <option value="THREADS">Threads</option>
+          <option value="AUDIENCE_NETWORK">Audience Network</option>
+        </select>
+        <select id="filterFormat" onchange="applyFilters()">
+          <option value="">Semua Format</option>
+          <option value="VIDEO">Video</option>
+          <option value="IMAGE">Image</option>
+          <option value="CAROUSEL">Carousel</option>
+          <option value="DPA">DPA (Dynamic)</option>
+          <option value="SHOPPING">Shopping</option>
+        </select>
+        <select id="filterStatus" onchange="applyFilters()">
+          <option value="">Semua Status</option>
+          <option value="active">Aktif</option>
+          <option value="inactive">Tidak Aktif</option>
+        </select>
+        <select id="sortBy" onchange="applyFilters()">
+          <option value="position">Urutkan: Posisi</option>
+          <option value="winning_desc">&#127942; Winning Score</option>
+          <option value="date_desc">Tanggal: Terbaru</option>
+          <option value="date_asc">Tanggal: Terlama</option>
+          <option value="likes_desc">Like: Terbanyak</option>
+          <option value="page_name">Nama Page A-Z</option>
+        </select>
+      </div>
+      <div class="filter-bar-row">
+        <div class="exclude-search-wrap" id="excludeSearchWrap">
+          <span class="exclude-input-icon">&#128683;</span>
+          <input type="text" class="exclude-input" id="excludeInput" placeholder="Exclude advertiser..." oninput="onExcludeInput()" onfocus="onExcludeFocus()" autocomplete="off">
+          <div class="exclude-dropdown" id="excludeDropdown"></div>
+        </div>
+        <div class="exclude-search-wrap" id="excludeUrlSearchWrap">
+          <span class="exclude-input-icon">&#128279;</span>
+          <input type="text" class="exclude-input" id="excludeUrlInput" placeholder="Exclude URL/domain..." oninput="onExcludeUrlInput()" onfocus="onExcludeUrlFocus()" autocomplete="off">
+          <div class="exclude-dropdown" id="excludeUrlDropdown"></div>
+        </div>
+        <span class="filter-count" id="filterCount">0 iklan</span>
+        <button class="btn-export" onclick="exportCSV()">&#8595; Export CSV</button>
+      </div>
+    </div>
+
+    <div class="exclude-panel" id="excludePanel">
+      <div class="exclude-panel-header">
+        <span class="exclude-title">&#128683; Advertiser Disembunyikan</span>
+        <div class="exclude-tags" id="excludeTags"></div>
+        <button class="btn-clear-exclude" onclick="clearAllExcluded()">&#10005; Hapus Semua</button>
+      </div>
+    </div>
+
+    <div class="exclude-panel" id="excludeUrlPanel" style="background:#f0f7ff;border-color:rgba(59,130,246,0.18)">
+      <div class="exclude-panel-header">
+        <span class="exclude-title" style="color:#1d4ed8">&#128279; URL / Domain Disembunyikan</span>
+        <div class="exclude-tags" id="excludeUrlTags"></div>
+        <button class="btn-clear-exclude" style="border-color:rgba(29,78,216,0.3);color:#1d4ed8" onclick="clearAllExcludedUrls()">&#10005; Hapus Semua</button>
+      </div>
+    </div>
+
+    <div class="winning-panel" id="winningPanel">
+      <div class="winning-panel-header">
+        <span class="winning-title">
+          &#127942; Winning Ad Detector
+          <button class="info-btn" onclick="openInfoModal('winning')" title="Cara kerja Winning Score">?</button>
+        </span>
+        <div class="winning-toggles">
+          <label class="toggle-pill">
+            <input type="checkbox" id="filterWinning" onchange="applyFilters()">
+            <span>&#127942; Top Winning</span>
+          </label>
+          <label class="toggle-pill">
+            <input type="checkbox" id="filterTrending" onchange="applyFilters()">
+            <span>&#128293; Trending Alert <button class="info-btn" onclick="event.preventDefault();event.stopPropagation();openInfoModal('trending')" title="Cara kerja Trending Alert">?</button></span>
+          </label>
+          <label class="toggle-pill">
+            <input type="checkbox" id="filterDuplicate" onchange="applyFilters()">
+            <span>&#128260; Duplikat / Scale <button class="info-btn" onclick="event.preventDefault();event.stopPropagation();openInfoModal('scale')" title="Cara kerja Scale/Duplikat">?</button></span>
+          </label>
+          <label class="toggle-pill">
+            <input type="checkbox" id="filterFbIg" onchange="applyFilters()">
+            <span>&#128241; FB+IG Only</span>
+          </label>
+          <label class="toggle-pill">
+            <input type="checkbox" id="filterDpa" onchange="applyFilters()">
+            <span>&#128722; DPA / Shopping <button class="info-btn" onclick="event.preventDefault();event.stopPropagation();openInfoModal('dpa')" title="Apa itu DPA?">?</button></span>
+          </label>
+          <label class="toggle-pill" style="border-color:#fde68a;background:#fffbeb;color:#92400e;" id="filterBookmarkPill">
+            <input type="checkbox" id="filterBookmark" onchange="applyFilters()">
+            <span>🔖 Bookmarked <span class="bookmark-count-badge" id="bookmarkToggleBadge" style="display:none">0</span></span>
+          </label>
+        </div>
+      </div>
+      <div class="winning-legend">
+        <div class="legend-item"><span class="badge-ws badge-high">80+</span> Top Winner</div>
+        <div class="legend-item"><span class="badge-ws badge-mid">50&#8211;79</span> Potential</div>
+        <div class="legend-item"><span class="badge-ws badge-low">&lt;50</span> Low Signal</div>
+        <div class="legend-item"><span class="badge-tag tag-trend">&#128293; Trending</span> Baru + Multi-platform</div>
+        <div class="legend-item"><span class="badge-tag tag-scale">&#128260; Scale</span> Duplikat iklan</div>
+        <div class="legend-item"><span style="background:#fdf4ff;color:#7e22ce;border:1px solid #e9d5ff;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600">&#128722; DPA</span> Dynamic Product Ad</div>
+        <div class="legend-item" style="margin-left:auto">
+          <button class="info-btn" onclick="openInfoModal('winning')" title="Panduan lengkap scoring">?</button>
+          <span style="font-size:11px;color:var(--muted);margin-left:4px">Panduan scoring</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ads-grid" id="adsGrid"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <span class="empty-icon">&#128269;</span>
+    <h3>Belum Ada Data</h3>
+    <p>Masukkan token Apify di Settings, lalu paste URL Facebook Ad Library dan klik Run Machine.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- JSON Modal -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Raw JSON</div>
+      <button class="modal-close" onclick="closeModalById('modalBg')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <pre id="modalContent"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT MODAL -->
+<div class="modal-bg" id="contentModalBg" onclick="closeContentModal(event)">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title" id="contentModalTitle">Konten Iklan</div>
+      <button class="modal-close" onclick="document.querySelectorAll('#contentModalBody video').forEach(v=>v.pause());closeModalById('contentModalBg')">&#10005;</button>
+    </div>
+    <div class="content-modal-body" id="contentModalBody"></div>
+  </div>
+</div>
+
+<!-- LANDING PAGE MODAL -->
+<div class="modal-bg" id="landingModalBg" onclick="closeLandingModal(event)">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div class="modal-title" id="landingModalTitle">Landing Page</div>
+      <button class="modal-close" onclick="closeLandingModalDirect()">&#10005;</button>
+    </div>
+    <div class="landing-frame-wrap">
+      <div class="landing-toolbar">
+        <span style="font-size:14px">&#128279;</span>
+        <div class="url-bar" id="landingUrlBar">—</div>
+        <a class="landing-btn primary" id="landingOpenBtn" href="#" target="_blank" rel="noopener">&#8599; Buka</a>
+        <button class="landing-btn" onclick="copyLandingUrl()">Salin</button>
+      </div>
+      <div class="iframe-container" id="landingIframeContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="settings-modal-bg" id="settingsModalBg" onclick="closeSettingsModal(event)">
+  <div class="settings-modal">
+    <div class="settings-modal-header">
+      <div class="settings-modal-title">
+        <svg width="16" height="16" viewBox="0 0 15 15" fill="none" style="flex-shrink:0">
+          <path d="M7.5 9.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M12.2 9.2a.9.9 0 0 0 .18 1l.65.65a.5.5 0 0 1 0 .7l-.7.7a.5.5 0 0 1-.7 0l-.65-.65a.9.9 0 0 0-1-.18.9.9 0 0 0-.55.83V13a.5.5 0 0 1-.5.5h-1A.5.5 0 0 1 9 13v-.75a.9.9 0 0 0-.55-.83.9.9 0 0 0-1 .18l-.65.65a.5.5 0 0 1-.7 0l-.7-.7a.5.5 0 0 1 0-.7l.65-.65a.9.9 0 0 0 .18-1 .9.9 0 0 0-.83-.54H4.5a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h.75a.9.9 0 0 0 .83-.55.9.9 0 0 0-.18-1l-.65-.65a.5.5 0 0 1 0-.7l.7-.7a.5.5 0 0 1 .7 0l.65.65a.9.9 0 0 0 1 .18.9.9 0 0 0 .55-.83V2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v.75a.9.9 0 0 0 .55.83.9.9 0 0 0 1-.18l.65-.65a.5.5 0 0 1 .7 0l.7.7a.5.5 0 0 1 0 .7l-.65.65a.9.9 0 0 0-.18 1 .9.9 0 0 0 .83.55h.75a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-.75a.9.9 0 0 0-.83.55Z" stroke="currentColor" stroke-width="1.3"/>
+        </svg>
+        Settings
+      </div>
+      <button class="info-modal-close" onclick="closeSettingsModalDirect()">&#10005;</button>
+    </div>
+    <div class="settings-modal-body">
+      <div class="settings-section">
+        <div class="settings-section-label">Apify API Token</div>
+        <div class="settings-section-desc">
+          Token tersimpan otomatis di browser kamu dan tidak akan hilang saat refresh.
+        </div>
+        <div class="settings-token-row">
+          <textarea
+            id="settingsToken"
+            class="scraper-input mono"
+            placeholder="apify_api_xxxxxxxxxxxx"
+            oninput="onSettingsTokenInput(this.value)"
+            autocomplete="on"
+            name="apify-token"
+            spellcheck="false"
+            rows="2"
+            style="resize:none;flex:1;padding:9px 13px;line-height:1.5;min-height:0;border-radius:8px;font-size:12px"></textarea>
+          <button class="settings-save-btn" id="settingsSaveBtn" onclick="saveTokenFromSettings()">
+            Simpan Token
+          </button>
+        </div>
+        <div class="settings-token-status" id="settingsTokenStatus"></div>
+        <div class="settings-hint">
+          &#128273; Belum punya token?
+          <a href="https://console.apify.com/account/integrations" target="_blank" rel="noopener">Buat di Apify Console &#8594;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INFO MODAL -->
+<div class="info-modal-bg" id="infoModalBg" onclick="closeInfoModal(event)">
+  <div class="info-modal">
+    <div class="info-modal-header">
+      <div class="info-modal-icon" id="infoModalIcon"></div>
+      <div class="info-modal-title" id="infoModalTitle"></div>
+      <button class="info-modal-close" onclick="closeInfoModalDirect()">&#10005;</button>
+    </div>
+    <div class="info-modal-body" id="infoModalBody"></div>
+  </div>
+</div>
+
+<script>
+  let allData = [];
+  let filteredData = [];
+  let currentPage = 1;
+  const PER_PAGE = 12;
+
+  let excludedAdvertisers = new Set();
+  let excludedMeta = {};
+  let excludedUrls = new Set();
+
+  // ─── STORAGE KEYS ─────────────────────────────────────────────
+  const LS_TOKEN     = 'adspy_apify_token';
+  const LS_HISTORY   = 'adspy_url_history';
+  const LS_DATA      = 'adspy_last_data';
+  const LS_BOOKMARKS = 'adspy_bookmarks';
+  const MAX_HISTORY  = 20;
+
+  // ─── STORAGE LAYER ────────────────────────────────────────────
+  // FIX: Token dan bookmark pakai localStorage LANGSUNG (bukan cookie-first).
+  // Cookie gagal di banyak browser modern karena SameSite/size limit.
+
+  const store = {
+    _mem: {},
+    get(key) {
+      try { const v = localStorage.getItem(key); if (v !== null) return v; } catch(e) {}
+      try { const v = sessionStorage.getItem(key); if (v !== null) return v; } catch(e) {}
+      return this._mem[key] !== undefined ? this._mem[key] : null;
+    },
+    set(key, val) {
+      this._mem[key] = val;
+      try { localStorage.setItem(key, val); return; } catch(e) {}
+      try { sessionStorage.setItem(key, val); } catch(e) {}
+    },
+    remove(key) {
+      delete this._mem[key];
+      try { localStorage.removeItem(key); } catch(e) {}
+      try { sessionStorage.removeItem(key); } catch(e) {}
+    }
+  };
+
+  function getToken() { return store.get(LS_TOKEN) || ''; }
+
+  function getUrlHistory() {
+    try { return JSON.parse(store.get(LS_HISTORY) || '[]'); } catch { return []; }
+  }
+
+  function saveUrlHistory(url) {
+    if (!url) return;
+    let history = getUrlHistory().filter(h => h.url !== url);
+    history.unshift({ url, date: new Date().toISOString() });
+    if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+    store.set(LS_HISTORY, JSON.stringify(history));
+  }
+
+  // ─── FIX: saveAdData — strip field besar sebelum simpan ke localStorage ──
+  // Data iklan bisa 5–20MB (ada image URL panjang, snapshot besar).
+  // Kita simpan versi ramping: hanya field yang dibutuhkan untuk render & filter.
+  function buildSlimAd(ad) {
+    const sn = ad.snapshot || {};
+    return {
+      ad_archive_id: ad.ad_archive_id,
+      page_id: ad.page_id,
+      page_name: ad.page_name,
+      is_active: ad.is_active,
+      start_date: ad.start_date,
+      end_date: ad.end_date,
+      start_date_formatted: ad.start_date_formatted,
+      end_date_formatted: ad.end_date_formatted,
+      publisher_platform: ad.publisher_platform,
+      collation_count: ad.collation_count,
+      collation_id: ad.collation_id,
+      ads_count: ad.ads_count,
+      ad_library_url: ad.ad_library_url,
+      position: ad.position,
+      snapshot: {
+        title: sn.title,
+        caption: sn.caption,
+        body: sn.body ? { text: sn.body.text } : undefined,
+        link_url: sn.link_url,
+        link_description: sn.link_description,
+        cta_text: sn.cta_text,
+        cta_type: sn.cta_type,
+        display_format: sn.display_format,
+        page_like_count: sn.page_like_count,
+        page_profile_picture_url: sn.page_profile_picture_url,
+        page_profile_uri: sn.page_profile_uri,
+        page_categories: sn.page_categories,
+        // Simpan satu image preview saja
+        images: sn.images ? sn.images.slice(0,1).map(i => ({
+          resized_image_url: i.resized_image_url,
+          original_image_url: i.original_image_url
+        })) : undefined,
+        // Simpan satu video preview saja
+        videos: sn.videos ? sn.videos.slice(0,1).map(v => ({
+          video_sd_url: v.video_sd_url,
+          video_hd_url: v.video_hd_url,
+          video_preview_image_url: v.video_preview_image_url
+        })) : undefined,
+        // Simpan cards ringkas
+        cards: sn.cards ? sn.cards.slice(0,5).map(c => ({
+          title: c.title,
+          body: c.body,
+          link_url: c.link_url,
+          resized_image_url: c.resized_image_url,
+          original_image_url: c.original_image_url
+        })) : undefined
+      }
+    };
+  }
+
+  function saveAdData(data) {
+    try {
+      // Coba simpan data asli dulu
+      const json = JSON.stringify(data);
+      localStorage.setItem(LS_DATA, json);
+      return;
+    } catch(e) {
+      // QuotaExceededError — simpan versi ramping
+      console.warn('AdSpy: localStorage penuh, menyimpan versi ramping...', e.name);
+    }
+    try {
+      const slim = data.map(buildSlimAd);
+      const json = JSON.stringify(slim);
+      localStorage.setItem(LS_DATA, json);
+      return;
+    } catch(e) {
+      console.warn('AdSpy: versi ramping juga gagal, coba sessionStorage...', e.name);
+    }
+    try {
+      const slim = data.map(buildSlimAd);
+      sessionStorage.setItem(LS_DATA, JSON.stringify(slim));
+      return;
+    } catch(e) {
+      console.warn('AdSpy: sessionStorage juga penuh, data tidak akan persisten', e.name);
+    }
+    // Fallback ke memori (tidak persisten tapi tidak error)
+    store._mem[LS_DATA] = JSON.stringify(data.map(buildSlimAd));
+  }
+
+  function getAdData() {
+    // Coba localStorage
+    try {
+      const v = localStorage.getItem(LS_DATA);
+      if (v) {
+        const parsed = JSON.parse(v);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch(e) {
+      console.warn('AdSpy: gagal baca localStorage', e);
+      // Hapus data corrupt
+      try { localStorage.removeItem(LS_DATA); } catch(_) {}
+    }
+    // Coba sessionStorage
+    try {
+      const v = sessionStorage.getItem(LS_DATA);
+      if (v) {
+        const parsed = JSON.parse(v);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch(e) {
+      console.warn('AdSpy: gagal baca sessionStorage', e);
+      try { sessionStorage.removeItem(LS_DATA); } catch(_) {}
+    }
+    // Coba memori
+    try {
+      const v = store._mem[LS_DATA];
+      if (v) return JSON.parse(v);
+    } catch(e) {}
+    return null;
+  }
+
+  // ─── BOOKMARK ─────────────────────────────────────────────────
+  // FIX: Bookmark pakai store.set() yang sekarang sudah localStorage-first
+  let bookmarkedIds = new Set();
+
+  function loadBookmarks() {
+    try {
+      const saved = store.get(LS_BOOKMARKS);
+      bookmarkedIds = new Set(saved ? JSON.parse(saved) : []);
+    } catch(e) {
+      console.warn('AdSpy: gagal load bookmarks', e);
+      bookmarkedIds = new Set();
+    }
+    updateBookmarkUI();
+  }
+
+  function saveBookmarks() {
+    try {
+      store.set(LS_BOOKMARKS, JSON.stringify([...bookmarkedIds]));
+    } catch(e) {
+      console.warn('AdSpy: gagal simpan bookmarks', e);
+    }
+  }
+
+  function toggleBookmark(adId, btn) {
+    adId = String(adId);
+    if (bookmarkedIds.has(adId)) {
+      bookmarkedIds.delete(adId);
+      btn.classList.remove('bookmarked');
+      btn.textContent = '🔖 Simpan';
+      btn.title = 'Simpan bookmark';
+      showToast('Bookmark dihapus', false);
+    } else {
+      bookmarkedIds.add(adId);
+      btn.classList.add('bookmarked');
+      btn.textContent = '🔖 Tersimpan';
+      btn.title = 'Hapus bookmark';
+      showToast('✓ Iklan disimpan ke bookmark!', true);
+    }
+    saveBookmarks();
+    updateBookmarkUI();
+  }
+
+  function updateBookmarkUI() {
+    const count = bookmarkedIds.size;
+    const statEl = document.getElementById('statBookmark');
+    const badgeEl = document.getElementById('bookmarkToggleBadge');
+    const cardEl = document.getElementById('statBookmarkCard');
+    if (statEl) statEl.textContent = count;
+    if (badgeEl) {
+      badgeEl.textContent = count;
+      badgeEl.style.display = count > 0 ? 'inline-flex' : 'none';
+    }
+    if (cardEl) cardEl.style.opacity = count > 0 ? '1' : '0.5';
+  }
+
+  // ─── INIT ─────────────────────────────────────────────────────
+  // FIX: loadBookmarks() harus sudah selesai SEBELUM applyFilters() → renderPage()
+  // Urutan yang benar:
+  // 1. loadBookmarks()  → isi bookmarkedIds dari localStorage
+  // 2. getAdData()       → ambil data iklan
+  // 3. applyFilters()    → render kartu (sudah tahu mana yang bookmarked)
+  (function init() {
+    updateTokenChip();
+
+    // STEP 1: Load bookmark dulu (sinkron)
+    loadBookmarks();
+
+    // STEP 2: Restore data iklan
+    try {
+      const parsed = getAdData();
+      if (parsed && Array.isArray(parsed) && parsed.length > 0) {
+        allData = parsed;
+        // STEP 3: Render — bookmarkedIds sudah terisi di STEP 1
+        applyFilters();
+        document.getElementById('statsSection').style.display = 'block';
+        document.getElementById('emptyState').style.display = 'none';
+        updateStats();
+        populateFormatFilter();
+        const banner = document.getElementById('dataSource');
+        if (banner) banner.textContent = parsed.length + ' iklan (sesi sebelumnya)';
+      }
+    } catch(e) {
+      console.warn('AdSpy: gagal restore data', e);
+    }
+  })();
+
+  function updateTokenChip() {
+    const chip = document.getElementById('tokenStatusChip');
+    if (!chip) return;
+    chip.className = 'token-status-chip empty';
+    chip.textContent = '';
+  }
+
+  function openSettings() {
+    const modal = document.getElementById('settingsModalBg');
+    const t = getToken();
+    const inp = document.getElementById('settingsToken');
+    inp.value = t;
+    updateSettingsTokenStatus(t ? 'saved' : 'empty');
+    modal.classList.add('open');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeSettingsModal(e) {
+    if (e.target === document.getElementById('settingsModalBg')) closeSettingsModalDirect();
+  }
+
+  function closeSettingsModalDirect() {
+    document.getElementById('settingsModalBg').classList.remove('open');
+    if (!document.querySelector('.modal-bg.open, .info-modal-bg.open')) document.body.classList.remove('modal-open');
+  }
+
+  function onSettingsTokenInput(val) {
+    val = val.replace(/\s+/g, '');
+    updateSettingsTokenStatus(val ? 'editing' : 'empty');
+  }
+
+  function updateSettingsTokenStatus(state) {
+    const el = document.getElementById('settingsTokenStatus');
+    const btn = document.getElementById('settingsSaveBtn');
+    if (!el) return;
+    if (state === 'saved') {
+      el.style.color = '#16a34a';
+      el.textContent = '✓ Token tersimpan di browser ini';
+      btn.classList.add('saved');
+      btn.textContent = '✓ Tersimpan';
+    } else if (state === 'editing') {
+      el.style.color = 'var(--muted)';
+      el.textContent = 'Klik "Simpan Token" untuk menyimpan';
+      btn.classList.remove('saved');
+      btn.textContent = 'Simpan Token';
+    } else {
+      el.style.color = 'var(--accent)';
+      el.innerHTML = '⚠ Belum ada token — masukkan token Apify kamu';
+      btn.classList.remove('saved');
+      btn.textContent = 'Simpan Token';
+    }
+  }
+
+  function saveTokenFromSettings() {
+    const raw = document.getElementById('settingsToken').value;
+    const val = raw.replace(/\s+/g, '');
+    if (!val) { showToast('Token tidak boleh kosong!'); return; }
+    store.set(LS_TOKEN, val);
+    updateSettingsTokenStatus('saved');
+    updateTokenChip();
+    showToast('Token berhasil disimpan!', true);
+    const btn = document.getElementById('settingsSaveBtn');
+    btn.classList.add('saved');
+    btn.textContent = '✓ Tersimpan';
+    setTimeout(() => { btn.classList.remove('saved'); btn.textContent = 'Simpan Token'; }, 2500);
+  }
+
+  // ─── SCRAPER ─────────────────────────────────────────────────
+
+  function setScraperStatus(state, text, sub = '', progress = null) {
+    const statusEl = document.getElementById('scraperStatus');
+    const dot = document.getElementById('scraperDot');
+    const textEl = document.getElementById('scraperStatusText');
+    const subEl = document.getElementById('scraperStatusSub');
+    const fillEl = document.getElementById('scraperProgressFill');
+    const cancelBtn = document.getElementById('scraperCancelBtn');
+    statusEl.classList.add('visible');
+    dot.className = 'scraper-status-dot dot-' + state;
+    textEl.textContent = text;
+    subEl.textContent = sub;
+    cancelBtn.style.display = state === 'running' ? 'inline-flex' : 'none';
+    if (progress === null) {
+      fillEl.classList.add('indeterminate');
+      fillEl.style.width = '';
+    } else {
+      fillEl.classList.remove('indeterminate');
+      fillEl.style.width = progress + '%';
+    }
+  }
+
+  function appendLog(msg) {
+    const log = document.getElementById('scraperLog');
+    log.classList.add('visible');
+    log.textContent += (log.textContent ? '\n' : '') + '[' + new Date().toLocaleTimeString('id-ID') + '] ' + msg;
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setRunBtn(disabled, icon = '&#9654;', text = 'Run Machine') {
+    const btn = document.getElementById('runBtn');
+    btn.disabled = disabled;
+    document.getElementById('runBtnIcon').innerHTML = icon;
+    document.getElementById('runBtnText').textContent = text;
+  }
+
+  let _scraperPollInterval = null;
+  let _scraperRunId = null;
+  let _scraperCancelled = false;
+
+  function cancelScraper() {
+    _scraperCancelled = true;
+    if (_scraperPollInterval) clearInterval(_scraperPollInterval);
+    setScraperStatus('error', 'Dibatalkan oleh user', '', 0);
+    setRunBtn(false);
+    appendLog('Dihentikan.');
+  }
+
+  async function runApifyScraper() {
+    const token = getToken();
+    const url   = document.getElementById('apifyUrl').value.trim();
+    const count = parseInt(document.getElementById('apifyCount').value) || 100;
+
+    if (!token) {
+      showToast('Token belum diset — buka Settings dulu!');
+      openSettings();
+      return;
+    }
+    if (!url) { showToast('Masukkan Ads Library URL dulu!'); document.getElementById('apifyUrl').focus(); return; }
+
+    _scraperCancelled = false;
+    _scraperRunId = null;
+    if (_scraperPollInterval) clearInterval(_scraperPollInterval);
+
+    const logEl = document.getElementById('scraperLog');
+    logEl.textContent = '';
+    logEl.classList.remove('visible');
+
+    setRunBtn(true, '&#9203;', 'Menjalankan...');
+    setScraperStatus('running', 'Memulai...', 'Menghubungkan ke server');
+    appendLog('Menghubungkan ke server...');
+    appendLog('URL: ' + url.substring(0, 80) + (url.length > 80 ? '…' : ''));
+
+    saveUrlHistory(url);
+
+    const body = {
+      count: parseInt(count),
+      scrapeAdDetails: false,
+      "scrapePageAds.activeStatus": "all",
+      "scrapePageAds.countryCode": "ALL",
+      "scrapePageAds.sortBy": "impressions_desc",
+      urls: [{ url }]
+    };
+
+    let runData;
+    try {
+      const resp = await fetch(
+        'https://api.apify.com/v2/acts/curious_coder~facebook-ads-library-scraper/runs?token=' + encodeURIComponent(token),
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      );
+      appendLog('HTTP status: ' + resp.status);
+      const rawText = await resp.text();
+      appendLog('Response preview: ' + rawText.substring(0, 120));
+      try {
+        runData = JSON.parse(rawText);
+      } catch(parseErr) {
+        setScraperStatus('error', 'Response bukan JSON', 'Status HTTP: ' + resp.status, 0);
+        setRunBtn(false);
+        appendLog('PARSE ERROR — raw response: ' + rawText.substring(0, 300));
+        return;
+      }
+    } catch (err) {
+      setScraperStatus('error', 'Gagal terhubung ke Apify', err.message, 0);
+      setRunBtn(false);
+      appendLog('NETWORK ERROR: ' + err.message);
+      return;
+    }
+
+    if (!runData?.data?.id) {
+      const msg = runData?.error?.message || JSON.stringify(runData).substring(0, 120);
+      setScraperStatus('error', 'Apify menolak request', msg, 0);
+      setRunBtn(false);
+      appendLog('ERROR dari Apify: ' + msg);
+      return;
+    }
+
+    _scraperRunId = runData.data.id;
+    appendLog('Run ID: ' + _scraperRunId);
+    setScraperStatus('running', 'Machine sedang berjalan...', 'Run ID: ' + _scraperRunId);
+    setRunBtn(true, '&#9203;', 'Berjalan...');
+
+    let pollCount = 0;
+    const maxPoll = 180;
+    _scraperPollInterval = setInterval(async () => {
+      if (_scraperCancelled) { clearInterval(_scraperPollInterval); return; }
+      pollCount++;
+      if (pollCount > maxPoll) {
+        clearInterval(_scraperPollInterval);
+        setScraperStatus('error', 'Timeout — proses terlalu lama', 'Coba dengan jumlah ads lebih sedikit', 0);
+        setRunBtn(false);
+        return;
+      }
+
+      let statusData;
+      try {
+        const sResp = await fetch('https://api.apify.com/v2/actor-runs/' + _scraperRunId + '?token=' + encodeURIComponent(token));
+        statusData = await sResp.json();
+      } catch (err) {
+        appendLog('Poll error: ' + err.message);
+        return;
+      }
+
+      const runStatus = statusData?.data?.status || 'UNKNOWN';
+      const elapsed = statusData?.data?.stats?.durationMillis
+        ? Math.round(statusData.data.stats.durationMillis / 1000) + 's'
+        : pollCount * 5 + 's';
+
+      appendLog('Status: ' + runStatus + ' (' + elapsed + ')');
+      setScraperStatus('running', 'Machine sedang berjalan... (' + elapsed + ')', 'Status: ' + runStatus + ' · Poll ke-' + pollCount);
+
+      if (runStatus === 'SUCCEEDED') {
+        clearInterval(_scraperPollInterval);
+        appendLog('Selesai! Memproses data...');
+        setScraperStatus('running', 'Memproses data...', 'Mengambil data dari server');
+        await fetchApifyResults(token, _scraperRunId, count);
+      } else if (['FAILED', 'ABORTED', 'TIMED-OUT'].includes(runStatus)) {
+        clearInterval(_scraperPollInterval);
+        const errMsg = statusData?.data?.exitCode ? 'Exit code: ' + statusData.data.exitCode : '';
+        setScraperStatus('error', 'Gagal: ' + runStatus, errMsg, 0);
+        setRunBtn(false);
+        appendLog('Proses gagal dengan status: ' + runStatus);
+      }
+    }, 5000);
+  }
+
+  async function fetchApifyResults(token, runId, count) {
+    let runDetails;
+    try {
+      const runResp = await fetch('https://api.apify.com/v2/actor-runs/' + runId + '?token=' + encodeURIComponent(token));
+      runDetails = await runResp.json();
+    } catch (err) {
+      setScraperStatus('error', 'Gagal ambil detail run', err.message, 0);
+      setRunBtn(false);
+      return;
+    }
+
+    const datasetId = runDetails?.data?.defaultDatasetId;
+    appendLog('Dataset ID: ' + (datasetId || 'tidak ditemukan'));
+
+    if (!datasetId) {
+      setScraperStatus('error', 'Dataset ID tidak ditemukan', '', 0);
+      setRunBtn(false);
+      return;
+    }
+
+    let items;
+    try {
+      const dataResp = await fetch(
+        'https://api.apify.com/v2/datasets/' + datasetId + '/items?token=' + encodeURIComponent(token) + '&limit=' + count + '&clean=true'
+      );
+      items = await dataResp.json();
+    } catch (err) {
+      setScraperStatus('error', 'Gagal download dataset', err.message, 0);
+      setRunBtn(false);
+      return;
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      setScraperStatus('error', 'Dataset kosong', 'Tidak ada data yang dikembalikan Apify', 0);
+      setRunBtn(false);
+      return;
+    }
+
+    appendLog('Berhasil: ' + items.length + ' iklan diterima.');
+    setScraperStatus('success', '✓ ' + items.length + ' iklan berhasil dimuat!', 'Data siap di dashboard', 100);
+    setRunBtn(false, '✓', 'Selesai');
+    document.getElementById('dataSource').textContent = '';
+
+    loadData(items);
+    showToast(items.length + ' iklan berhasil dimuat!', true);
+
+    setTimeout(() => {
+      document.getElementById('statsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 400);
+
+    setTimeout(() => setRunBtn(false, '&#9654;', 'Run Machine'), 3000);
+  }
+
+  function loadData(data) {
+    if (!Array.isArray(data)) data = [data];
+    allData = data;
+    saveAdData(data);
+    // Pastikan bookmark sudah dimuat sebelum render
+    // (sudah dimuat di init, tapi jika loadData dipanggil manual, reload bookmark dulu)
+    loadBookmarks();
+    applyFilters();
+    document.getElementById('statsSection').style.display = 'block';
+    document.getElementById('emptyState').style.display = 'none';
+    updateStats();
+    populateFormatFilter();
+    showToast(data.length + ' iklan berhasil dimuat!', true);
+  }
+
+  function updateStats() {
+    document.getElementById('statTotal').textContent = allData.length;
+    document.getElementById('statActive').textContent = allData.filter(a => a.is_active).length;
+    document.getElementById('statNonActive').textContent = allData.filter(a => !a.is_active).length;
+    document.getElementById('statWinning').textContent = allData.filter(a => calcWinningScore(a) >= 80).length;
+    document.getElementById('statTrending').textContent = allData.filter(a => isTrending(a)).length;
+    document.getElementById('statDuplicate').textContent = allData.filter(a => isDuplicate(a)).length;
+    document.getElementById('statDpa').textContent = allData.filter(a => isDpa(a)).length;
+    const pages = new Set(allData.map(a => a.page_id || a.page_name)).size;
+    document.getElementById('statPages').textContent = pages;
+  }
+
+  function populateFormatFilter() {
+    const formats = [...new Set(allData.map(a => getAdFormat(a)).filter(Boolean))];
+    const sel = document.getElementById('filterFormat');
+    sel.innerHTML = '<option value="">Semua Format</option>';
+    const stdFormats = ['VIDEO', 'IMAGE', 'CAROUSEL', 'DPA', 'SHOPPING'];
+    const allFormats = [...new Set([...stdFormats, ...formats])];
+    allFormats.forEach(f => {
+      const o = document.createElement('option');
+      o.value = f;
+      const labels = { 'VIDEO': 'Video', 'IMAGE': 'Image', 'CAROUSEL': 'Carousel', 'DPA': 'DPA (Dynamic Product)', 'SHOPPING': 'Shopping' };
+      o.textContent = labels[f] || f;
+      sel.appendChild(o);
+    });
+  }
+
+  const TODAY_TS = Math.floor(Date.now() / 1000);
+
+  function getAdFormat(ad) {
+    const sn = ad.snapshot || {};
+    const fmt = (sn.display_format || '').toUpperCase();
+    if (fmt) return fmt;
+    if (sn.videos && sn.videos.length > 0) return 'VIDEO';
+    if (sn.cards && sn.cards.length > 0) return 'CAROUSEL';
+    if (sn.images && sn.images.length > 0) return 'IMAGE';
+    return 'UNKNOWN';
+  }
+
+  function isDpa(ad) {
+    const fmt = getAdFormat(ad);
+    if (fmt === 'DPA' || fmt === 'SHOPPING') return true;
+    const sn = ad.snapshot || {};
+    const title = sn.title || '';
+    if (title.includes('{{') && title.includes('}}')) return true;
+    const body = sn.body?.text || '';
+    if (body.includes('{{product.') || body.includes('{{retailer_')) return true;
+    return false;
+  }
+
+  function isDpaTemplate(str) {
+    return str && str.includes('{{') && str.includes('}}');
+  }
+
+  function calcWinningScore(ad) {
+    const startDate = ad.start_date || 0;
+    const daysActive = startDate ? Math.floor((TODAY_TS - startDate) / 86400) : 0;
+    let durationScore = 0;
+    if (daysActive >= 180) durationScore = 50;
+    else if (daysActive >= 90) durationScore = 40;
+    else if (daysActive >= 60) durationScore = 32;
+    else if (daysActive >= 30) durationScore = 20;
+    else if (daysActive >= 14) durationScore = 11;
+    else durationScore = 4;
+    const collCount = ad.collation_count || 1;
+    let scaleScore = 0;
+    if (collCount >= 7) scaleScore = 35;
+    else if (collCount >= 4) scaleScore = 25;
+    else if (collCount >= 2) scaleScore = 14;
+    else scaleScore = 2;
+    const activeBonus = ad.is_active ? 15 : 0;
+    const dpaBonus = isDpa(ad) ? 5 : 0;
+    return Math.min(Math.round(durationScore + scaleScore + activeBonus + dpaBonus), 100);
+  }
+
+  function isTrending(ad) {
+    const startDate = ad.start_date || 0;
+    const daysActive = startDate ? Math.floor((TODAY_TS - startDate) / 86400) : 999;
+    const platforms = ad.publisher_platform || [];
+    return daysActive <= 45 && platforms.length >= 3 && ad.is_active;
+  }
+
+  function isDuplicate(ad) {
+    return (ad.collation_count || 1) > 1 || (ad.ads_count || 1) > 1;
+  }
+
+  function getPlatformLabel(platforms) {
+    const p = platforms || [];
+    const hasFb = p.includes('FACEBOOK');
+    const hasIg = p.includes('INSTAGRAM');
+    if (hasFb && hasIg && p.length === 2) return 'FB+IG';
+    if (hasFb && hasIg && p.length > 2) return 'FB+IG+' + (p.length - 2) + '+';
+    if (hasFb && !hasIg) return 'FB Only';
+    if (!hasFb && hasIg) return 'IG Only';
+    return p.slice(0, 2).join('+');
+  }
+
+  function applyFilters(opts) {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const platform = document.getElementById('filterPlatform').value;
+    const format = document.getElementById('filterFormat').value;
+    const status = document.getElementById('filterStatus').value;
+    const sort = document.getElementById('sortBy').value;
+    const filterWinning = document.getElementById('filterWinning')?.checked;
+    const filterTrending = document.getElementById('filterTrending')?.checked;
+    const filterDuplicate = document.getElementById('filterDuplicate')?.checked;
+    const filterFbIg = document.getElementById('filterFbIg')?.checked;
+    const filterDpa = document.getElementById('filterDpa')?.checked;
+    const filterBookmark = document.getElementById('filterBookmark')?.checked;
+
+    filteredData = allData.filter(ad => {
+      const sn = ad.snapshot || {};
+      const body = (sn.body?.text || '').toLowerCase();
+      const title = (sn.title || '').toLowerCase();
+      const pageName = (ad.page_name || '').toLowerCase();
+      const linkUrl = (sn.link_url || '').toLowerCase();
+
+      if (search && !body.includes(search) && !title.includes(search) && !pageName.includes(search) && !linkUrl.includes(search)) return false;
+      if (platform && !(ad.publisher_platform || []).includes(platform)) return false;
+      if (format && getAdFormat(ad) !== format) return false;
+      if (status === 'active' && !ad.is_active) return false;
+      if (status === 'inactive' && ad.is_active) return false;
+      if (filterWinning && calcWinningScore(ad) < 80) return false;
+      if (filterTrending && !isTrending(ad)) return false;
+      if (filterDuplicate && !isDuplicate(ad)) return false;
+      if (filterFbIg) {
+        const pp = ad.publisher_platform || [];
+        if (!pp.includes('FACEBOOK') || !pp.includes('INSTAGRAM')) return false;
+      }
+      if (filterDpa && !isDpa(ad)) return false;
+      if (filterBookmark && !bookmarkedIds.has(String(ad.ad_archive_id))) return false;
+
+      if (excludedAdvertisers.size > 0) {
+        const adKey = ad.page_id ? 'id:' + ad.page_id : 'name:' + (ad.page_name || '');
+        const adNameKey = 'name:' + (ad.page_name || '').trim().toLowerCase();
+        if (excludedAdvertisers.has(adKey) || excludedAdvertisers.has(adNameKey)) return false;
+      }
+
+      if (excludedUrls.size > 0) {
+        const adLinkUrl = (sn.link_url || '').toLowerCase();
+        const cardUrls = (sn.cards || []).map(c => (c.link_url || '').toLowerCase());
+        const allUrls = [adLinkUrl, ...cardUrls].filter(Boolean);
+        for (const pattern of excludedUrls) {
+          if (allUrls.some(u => u.includes(pattern))) return false;
+        }
+      }
+
+      return true;
+    });
+
+    filteredData.sort((a, b) => {
+      if (sort === 'winning_desc') return calcWinningScore(b) - calcWinningScore(a);
+      if (sort === 'date_desc') return (b.start_date || 0) - (a.start_date || 0);
+      if (sort === 'date_asc') return (a.start_date || 0) - (b.start_date || 0);
+      if (sort === 'likes_desc') return ((b.snapshot?.page_like_count) || 0) - ((a.snapshot?.page_like_count) || 0);
+      if (sort === 'page_name') return (a.page_name || '').localeCompare(b.page_name || '');
+      return (a.position || 0) - (b.position || 0);
+    });
+
+    if (!opts?.preservePage) currentPage = 1;
+    const totalPages = Math.ceil(filteredData.length / PER_PAGE);
+    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+    document.getElementById('filterCount').textContent = filteredData.length + ' iklan';
+    renderPage();
+  }
+
+  // ─── EXCLUDE ─────────────────────────────────────────────────
+
+  function excludeAdvertiser(pageName, pageId) {
+    if (!pageName && !pageId) return;
+    const key = pageId ? 'id:' + pageId : 'name:' + (pageName || '').trim().toLowerCase();
+    if (excludedAdvertisers.has(key)) { showToast('"' + pageName + '" sudah di-exclude', false); return; }
+    const adRef = allData.find(a => (pageId && a.page_id == pageId) || (!pageId && a.page_name === pageName));
+    const avatar = adRef?.snapshot?.page_profile_picture_url || '';
+    excludedAdvertisers.add(key);
+    excludedMeta[key] = { name: pageName || '(unknown)', avatar };
+    renderExcludePanel();
+    applyFilters({ preservePage: true });
+    showToast('&#128683; "' + (pageName || 'Advertiser') + '" disembunyikan', false);
+  }
+
+  function unexcludeAdvertiser(key) {
+    const name = excludedMeta[key]?.name || key;
+    excludedAdvertisers.delete(key);
+    delete excludedMeta[key];
+    renderExcludePanel();
+    applyFilters({ preservePage: true });
+    showToast('&#10003; "' + name + '" ditampilkan kembali', true);
+  }
+
+  function clearAllExcluded() {
+    const count = excludedAdvertisers.size;
+    excludedAdvertisers.clear();
+    excludedMeta = {};
+    renderExcludePanel();
+    applyFilters({ preservePage: true });
+    showToast('&#10003; ' + count + ' advertiser ditampilkan kembali', true);
+  }
+
+  function extractDomain(url) {
+    try {
+      const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+      return u.hostname.replace(/^www\./, '');
+    } catch {
+      return url.toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+    }
+  }
+
+  function excludeUrl(pattern) {
+    pattern = pattern.trim().toLowerCase();
+    if (!pattern) return;
+    if (excludedUrls.has(pattern)) { showToast('"' + pattern + '" sudah di-exclude', false); return; }
+    excludedUrls.add(pattern);
+    renderExcludeUrlPanel();
+    applyFilters({ preservePage: true });
+    showToast('&#128279; "' + pattern + '" disembunyikan', false);
+  }
+
+  function unexcludeUrl(pattern) {
+    excludedUrls.delete(pattern);
+    renderExcludeUrlPanel();
+    applyFilters({ preservePage: true });
+    showToast('&#10003; "' + pattern + '" ditampilkan kembali', true);
+  }
+
+  function clearAllExcludedUrls() {
+    const count = excludedUrls.size;
+    excludedUrls.clear();
+    renderExcludeUrlPanel();
+    applyFilters({ preservePage: true });
+    showToast('&#10003; ' + count + ' URL ditampilkan kembali', true);
+  }
+
+  function renderExcludeUrlPanel() {
+    const panel = document.getElementById('excludeUrlPanel');
+    const tagsEl = document.getElementById('excludeUrlTags');
+    if (!panel) return;
+    if (excludedUrls.size === 0) { panel.classList.remove('has-items'); tagsEl.innerHTML = ''; return; }
+    panel.classList.add('has-items');
+    tagsEl.innerHTML = [...excludedUrls].map(pattern =>
+      '<span class="exclude-tag-url">&#128279; ' + escHtml(pattern) +
+      '<button class="exclude-tag-url-remove" data-unexclude-url="' + escHtml(pattern) + '" title="Tampilkan kembali">&#215;</button></span>'
+    ).join('');
+  }
+
+  let _urlDropdownItems = [];
+
+  function buildDomainList(query) {
+    const domainMap = {};
+    allData.forEach(ad => {
+      const sn = ad.snapshot || {};
+      const urls = [sn.link_url, ...(sn.cards || []).map(c => c.link_url)].filter(Boolean);
+      urls.forEach(url => {
+        const domain = extractDomain(url);
+        if (!domain || domain.length < 3) return;
+        if (!domainMap[domain]) domainMap[domain] = { domain, count: 0, sample: url };
+        domainMap[domain].count++;
+      });
+    });
+    let list = Object.values(domainMap);
+    if (query) list = list.filter(d => d.domain.includes(query.toLowerCase()));
+    list.sort((a, b) => b.count - a.count);
+    return list.slice(0, 12);
+  }
+
+  function onExcludeUrlInput() { renderExcludeUrlDropdown(document.getElementById('excludeUrlInput').value.trim()); }
+  function onExcludeUrlFocus() { renderExcludeUrlDropdown(document.getElementById('excludeUrlInput').value.trim()); }
+
+  function renderExcludeUrlDropdown(query) {
+    const dropdown = document.getElementById('excludeUrlDropdown');
+    if (!allData.length) { dropdown.classList.remove('open'); return; }
+    const items = buildDomainList(query);
+    _urlDropdownItems = items;
+    if (!items.length) {
+      dropdown.innerHTML = '<div class="exclude-dropdown-empty">Tidak ada domain ditemukan</div>';
+      dropdown.classList.add('open');
+      return;
+    }
+    dropdown.innerHTML = items.map((item, i) => {
+      const already = excludedUrls.has(item.domain);
+      return '<div class="exclude-dropdown-item' + (already ? ' already-excluded' : '') + '" data-url-idx="' + i + '">' +
+        '<span style="font-size:14px;flex-shrink:0">&#128279;</span>' +
+        '<span class="exclude-dropdown-name" style="font-family:\'DM Mono\',monospace;font-size:11px">' + escHtml(item.domain) + '</span>' +
+        '<span class="exclude-dropdown-count">' + (already ? '&#10003; excluded' : item.count + ' iklan') + '</span></div>';
+    }).join('');
+    dropdown.classList.add('open');
+  }
+
+  function renderExcludePanel() {
+    const panel = document.getElementById('excludePanel');
+    const tagsEl = document.getElementById('excludeTags');
+    if (excludedAdvertisers.size === 0) { panel.classList.remove('has-items'); tagsEl.innerHTML = ''; return; }
+    panel.classList.add('has-items');
+    tagsEl.innerHTML = [...excludedAdvertisers].map(key => {
+      const meta = excludedMeta[key] || {};
+      const name = meta.name || key;
+      const avatar = meta.avatar || '';
+      const avatarHtml = avatar
+        ? '<img src="' + escHtml(avatar) + '" style="width:16px;height:16px;border-radius:50%;object-fit:cover;vertical-align:middle;border:1px solid rgba(232,40,74,0.2)" onerror="this.style.display=\'none\'">'
+        : '&#128683;';
+      return '<span class="exclude-tag">' + avatarHtml + ' ' + escHtml(name) +
+        '<button class="exclude-tag-remove" data-unexclude-key="' + escHtml(key) + '" title="Tampilkan kembali">&#215;</button></span>';
+    }).join('');
+  }
+
+  function onExcludeInput() { renderExcludeDropdown(document.getElementById('excludeInput').value.trim().toLowerCase()); }
+  function onExcludeFocus() { renderExcludeDropdown(document.getElementById('excludeInput').value.trim().toLowerCase()); }
+
+  let _dropdownAdvertisers = [];
+
+  function renderExcludeDropdown(query) {
+    const dropdown = document.getElementById('excludeDropdown');
+    if (!allData.length) { dropdown.classList.remove('open'); return; }
+    const advertiserMap = {};
+    allData.forEach(ad => {
+      const key = ad.page_id ? 'id:' + ad.page_id : 'name:' + (ad.page_name || '').trim().toLowerCase();
+      if (!advertiserMap[key]) advertiserMap[key] = { key, name: ad.page_name || '', avatar: ad.snapshot?.page_profile_picture_url || '', count: 0 };
+      advertiserMap[key].count++;
+    });
+    let advertisers = Object.values(advertiserMap);
+    if (query) advertisers = advertisers.filter(a => a.name.toLowerCase().includes(query));
+    advertisers.sort((a, b) => b.count - a.count);
+    advertisers = advertisers.slice(0, 12);
+    _dropdownAdvertisers = advertisers;
+    if (!advertisers.length) {
+      dropdown.innerHTML = '<div class="exclude-dropdown-empty">Tidak ada hasil untuk "' + escHtml(query) + '"</div>';
+      dropdown.classList.add('open');
+      return;
+    }
+    dropdown.innerHTML = advertisers.map((a, i) => {
+      const already = excludedAdvertisers.has(a.key);
+      return '<div class="exclude-dropdown-item' + (already ? ' already-excluded' : '') + '" data-idx="' + i + '">' +
+        '<img class="exclude-dropdown-avatar" src="' + escHtml(a.avatar) + '" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 26 26%22><rect width=%2226%22 height=%2226%22 fill=%22%23f4f4f5%22/><text x=%2250%25%22 y=%2257%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2213%22>&#128196;</text></svg>\'">' +
+        '<span class="exclude-dropdown-name">' + escHtml(a.name || '(unknown)') + '</span>' +
+        '<span class="exclude-dropdown-count">' + (already ? '&#10003; excluded' : a.count + ' ads') + '</span></div>';
+    }).join('');
+    dropdown.classList.add('open');
+  }
+
+  function selectExcludeAdvertiser(key, name, avatar) {
+    if (excludedAdvertisers.has(key)) return;
+    excludedAdvertisers.add(key);
+    excludedMeta[key] = { name, avatar: avatar || '' };
+    document.getElementById('excludeInput').value = '';
+    document.getElementById('excludeDropdown').classList.remove('open');
+    renderExcludePanel();
+    applyFilters({ preservePage: true });
+    showToast('&#128683; "' + name + '" disembunyikan', false);
+  }
+
+  document.addEventListener('click', e => {
+    const urlDropItem = e.target.closest('[data-url-idx]');
+    if (urlDropItem && !urlDropItem.classList.contains('already-excluded')) {
+      const idx = parseInt(urlDropItem.getAttribute('data-url-idx'), 10);
+      const item = _urlDropdownItems[idx];
+      if (item) { excludeUrl(item.domain); document.getElementById('excludeUrlInput').value = ''; document.getElementById('excludeUrlDropdown').classList.remove('open'); }
+      return;
+    }
+    const dropItem = e.target.closest('[data-idx]');
+    if (dropItem && !dropItem.classList.contains('already-excluded')) {
+      const idx = parseInt(dropItem.getAttribute('data-idx'), 10);
+      const a = _dropdownAdvertisers[idx];
+      if (a) selectExcludeAdvertiser(a.key, a.name, a.avatar);
+      return;
+    }
+    const unexcludeBtn = e.target.closest('[data-unexclude-key]');
+    if (unexcludeBtn) { unexcludeAdvertiser(unexcludeBtn.getAttribute('data-unexclude-key')); return; }
+    const unexcludeUrlBtn = e.target.closest('[data-unexclude-url]');
+    if (unexcludeUrlBtn) { unexcludeUrl(unexcludeUrlBtn.getAttribute('data-unexclude-url')); return; }
+    const hideBtn = e.target.closest('[data-hide-page-name]');
+    if (hideBtn) { excludeAdvertiser(hideBtn.getAttribute('data-hide-page-name'), hideBtn.getAttribute('data-hide-page-id')); return; }
+    const wrap = document.getElementById('excludeSearchWrap');
+    if (wrap && !wrap.contains(e.target)) document.getElementById('excludeDropdown')?.classList.remove('open');
+    const urlWrap = document.getElementById('excludeUrlSearchWrap');
+    if (urlWrap && !urlWrap.contains(e.target)) document.getElementById('excludeUrlDropdown')?.classList.remove('open');
+  });
+
+  // ─── INFO MODAL ───────────────────────────────────────────────
+
+  const INFO_CONTENT = {
+    winning: {
+      icon: '&#127942;',
+      iconClass: 'winning',
+      title: 'Cara Kerja Winning Score',
+      build: () => `
+        <div class="info-desc">Winning Score (0–100) mengukur seberapa "proven" sebuah iklan berdasarkan tiga faktor: durasi aktif, jumlah variasi/duplikat, dan status aktif saat ini.</div>
+        <div>
+          <div class="info-section-label">Formula</div>
+          <div class="formula-eq">Score = <span class="fp fp-duration">Durasi</span> <span class="fp-op">+</span> <span class="fp fp-scale">Scale</span> <span class="fp-op">+</span> <span class="fp fp-active">Aktif</span> <span class="fp-op">+</span> <span class="fp fp-dpa">DPA</span> <span class="fp-op">→ max</span> <span class="fp fp-max">100</span></div>
+        </div>
+        <div>
+          <div class="info-section-label">🧮 Kalkulator Live</div>
+          <div class="live-calc">
+            <div class="calc-row"><span class="calc-label">Durasi aktif</span><input type="range" class="calc-slider" id="calcDays" min="0" max="400" value="90" oninput="updateCalc()"><span class="calc-val" id="calcDaysVal">90 hr</span></div>
+            <div class="calc-row"><span class="calc-label">Collation count</span><input type="range" class="calc-slider" id="calcColl" min="1" max="10" value="3" oninput="updateCalc()"><span class="calc-val" id="calcCollVal">3×</span></div>
+            <div class="calc-check-row"><input type="checkbox" class="calc-check" id="calcActive" checked onchange="updateCalc()"><span class="calc-label" style="min-width:auto">Iklan masih aktif (+15)</span></div>
+            <div class="calc-check-row"><input type="checkbox" class="calc-check" id="calcDpa" onchange="updateCalc()"><span class="calc-label" style="min-width:auto">Format DPA (+5)</span></div>
+            <div class="calc-result" id="calcResult">
+              <div class="calc-score-big" id="calcScoreBig" style="color:var(--accent)">—</div>
+              <div class="calc-meta"><div class="calc-tier" id="calcTier">—</div><div class="calc-breakdown" id="calcBreakdown">—</div><div class="score-bar-wrap"><div class="score-bar-fill" id="calcBar"></div></div></div>
+            </div>
+          </div>
+        </div>`
+    },
+    trending: {
+      icon: '&#128293;',
+      iconClass: 'trending',
+      title: 'Cara Kerja Trending Alert',
+      build: () => `
+        <div class="info-desc">Trending Alert menandai iklan baru (≤45 hari) yang langsung dijalankan di ≥3 platform dan masih aktif.</div>
+        <div class="criteria-list">
+          <div class="criteria-item"><span class="ci-icon">📅</span><div class="ci-text"><strong>Umur iklan ≤ 45 hari</strong><span class="ci-sub">Iklan masih segar dan relevan.</span></div><span class="ci-badge cb-required">WAJIB</span></div>
+          <div class="criteria-item"><span class="ci-icon">📱</span><div class="ci-text"><strong>Tayang di ≥ 3 platform</strong><span class="ci-sub">Misalnya: Facebook + Instagram + Messenger.</span></div><span class="ci-badge cb-required">WAJIB</span></div>
+          <div class="criteria-item"><span class="ci-icon">✓</span><div class="ci-text"><strong>Iklan masih aktif</strong></div><span class="ci-badge cb-required">WAJIB</span></div>
+        </div>`
+    },
+    scale: {
+      icon: '&#128260;',
+      iconClass: 'scale',
+      title: 'Cara Kerja Scale / Duplikat',
+      build: () => `
+        <div class="info-desc">Label Scale muncul ketika iklan memiliki lebih dari satu variasi (collation_count > 1).</div>
+        <table class="score-table">
+          <thead><tr><th>collation_count</th><th>Interpretasi</th><th class="pts">Poin</th></tr></thead>
+          <tbody>
+            <tr><td>≥ 7 variasi</td><td>Scale masif</td><td class="pts pts-high">+35</td></tr>
+            <tr><td>4–6 variasi</td><td>Scale signifikan</td><td class="pts pts-mid">+25</td></tr>
+            <tr><td>2–3 variasi</td><td>Mulai di-scale</td><td class="pts pts-mid">+14</td></tr>
+            <tr><td>1 variasi</td><td>Belum di-scale</td><td class="pts pts-low">+2</td></tr>
+          </tbody>
+        </table>`
+    },
+    dpa: {
+      icon: '&#128722;',
+      iconClass: 'dpa',
+      title: 'Apa itu DPA (Dynamic Product Ad)?',
+      build: () => `
+        <div class="info-desc">DPA adalah format iklan yang otomatis menampilkan produk relevan berdasarkan riwayat browsing/pembelian pengguna.</div>
+        <div class="criteria-list">
+          <div class="criteria-item"><span class="ci-icon">🏷</span><div class="ci-text"><strong>display_format = "DPA" atau "SHOPPING"</strong></div><span class="ci-badge cb-required">CEK 1</span></div>
+          <div class="criteria-item"><span class="ci-icon">🔧</span><div class="ci-text"><strong>Judul mengandung template {{...}}</strong><span class="ci-sub">Contoh: {{product.name}}, {{product.price}}</span></div><span class="ci-badge cb-required">CEK 2</span></div>
+        </div>`
+    }
+  };
+
+  function openInfoModal(type) {
+    const content = INFO_CONTENT[type];
+    if (!content) return;
+    document.getElementById('infoModalIcon').className = 'info-modal-icon ' + content.iconClass;
+    document.getElementById('infoModalIcon').innerHTML = content.icon;
+    document.getElementById('infoModalTitle').textContent = content.title;
+    document.getElementById('infoModalBody').innerHTML = content.build();
+    document.getElementById('infoModalBg').classList.add('open');
+    document.body.classList.add('modal-open');
+    if (type === 'winning') setTimeout(updateCalc, 50);
+  }
+
+  function closeInfoModal(e) {
+    if (e.target === document.getElementById('infoModalBg')) closeInfoModalDirect();
+  }
+
+  function closeInfoModalDirect() {
+    document.getElementById('infoModalBg').classList.remove('open');
+    if (!document.querySelector('.modal-bg.open')) document.body.classList.remove('modal-open');
+  }
+
+  function updateCalc() {
+    const days = parseInt(document.getElementById('calcDays')?.value || 90);
+    const coll = parseInt(document.getElementById('calcColl')?.value || 3);
+    const isActive = document.getElementById('calcActive')?.checked ?? true;
+    const isDpaCheck = document.getElementById('calcDpa')?.checked ?? false;
+    document.getElementById('calcDaysVal').textContent = days + ' hr';
+    document.getElementById('calcCollVal').textContent = coll + '×';
+    let durScore = 0;
+    if (days >= 180) durScore = 50; else if (days >= 90) durScore = 40; else if (days >= 60) durScore = 32;
+    else if (days >= 30) durScore = 20; else if (days >= 14) durScore = 11; else durScore = 4;
+    let scaleScore = 0;
+    if (coll >= 7) scaleScore = 35; else if (coll >= 4) scaleScore = 25; else if (coll >= 2) scaleScore = 14; else scaleScore = 2;
+    const activeBonus = isActive ? 15 : 0;
+    const dpaBonus = isDpaCheck ? 5 : 0;
+    const total = Math.min(durScore + scaleScore + activeBonus + dpaBonus, 100);
+    const bigEl = document.getElementById('calcScoreBig');
+    const tierEl = document.getElementById('calcTier');
+    const breakEl = document.getElementById('calcBreakdown');
+    const barEl = document.getElementById('calcBar');
+    if (!bigEl) return;
+    bigEl.textContent = total;
+    let tierColor, tierLabel;
+    if (total >= 80) { tierColor = 'var(--accent)'; tierLabel = '🏆 Top Winner'; }
+    else if (total >= 50) { tierColor = '#1d4ed8'; tierLabel = '⭐ Potential Winner'; }
+    else { tierColor = 'var(--muted)'; tierLabel = '· Low Signal'; }
+    bigEl.style.color = tierColor;
+    tierEl.innerHTML = tierLabel;
+    tierEl.style.color = tierColor;
+    breakEl.innerHTML = 'Durasi: +' + durScore + ' | Scale: +' + scaleScore + ' | Aktif: +' + activeBonus + ' | DPA: +' + dpaBonus;
+    barEl.style.width = total + '%';
+    barEl.style.background = total >= 80 ? 'var(--accent)' : total >= 50 ? '#1d4ed8' : '#a1a1aa';
+  }
+
+  // ─── EXPORT ───────────────────────────────────────────────────
+
+  function exportCSV() {
+    if (!filteredData.length) { showToast('Tidak ada data untuk di-export!'); return; }
+    const headers = ['No','Ad Archive ID','Page Name','Page ID','Status','Format','Is DPA','Platforms','Start Date','End Date','Days Active','Winning Score','Is Trending','Is Duplicate/Scale','Platform Label','Title','Body (100 char)','Link URL','CTA Text','CTA Type','Page Likes','Collation Count','Collation ID','Ads Count','Ad Library URL','Page Profile URL'];
+    const rows = filteredData.map((ad, i) => {
+      const sn = ad.snapshot || {};
+      const platforms = (ad.publisher_platform || []).join('|');
+      const startDate = ad.start_date ? new Date(ad.start_date * 1000).toLocaleDateString('id-ID') : '';
+      const endDate = ad.end_date ? new Date(ad.end_date * 1000).toLocaleDateString('id-ID') : '';
+      const daysActive = ad.start_date ? Math.floor((TODAY_TS - ad.start_date) / 86400) : '';
+      const score = calcWinningScore(ad);
+      const fmt = getAdFormat(ad);
+      return [i+1,ad.ad_archive_id||'','"'+(ad.page_name||'').replace(/"/g,'""')+'"',ad.page_id||'',ad.is_active?'Aktif':'Nonaktif',fmt,isDpa(ad)?'Ya':'Tidak','"'+platforms+'"',startDate,endDate,daysActive,score,isTrending(ad)?'Ya':'Tidak',isDuplicate(ad)?'Ya':'Tidak',getPlatformLabel(ad.publisher_platform),'"'+(sn.title||'').replace(/"/g,'""')+'"','"'+(sn.body?.text||'').substring(0,100).replace(/\n/g,' ').replace(/"/g,'""')+'"','"'+(sn.link_url||'')+'"','"'+(sn.cta_text||'')+'"',sn.cta_type||'',sn.page_like_count||0,ad.collation_count||1,ad.collation_id||'',ad.ads_count||1,'"'+(ad.ad_library_url||'')+'"','"'+(sn.page_profile_uri||'')+'"'].join(',');
+    });
+    const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'adspy_export_' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Export ' + filteredData.length + ' iklan berhasil!', true);
+  }
+
+  // ─── RENDER ───────────────────────────────────────────────────
+
+  function renderPage() {
+    const grid = document.getElementById('adsGrid');
+    const start = (currentPage - 1) * PER_PAGE;
+    const slice = filteredData.slice(start, start + PER_PAGE);
+    if (filteredData.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;opacity:0.3;margin-bottom:14px">🔍</div><div style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:18px;color:var(--text);font-weight:700;margin-bottom:8px">Tidak ada hasil</div><div style="font-size:13px">Coba ubah filter atau kata kunci pencarian</div></div>';
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+    grid.innerHTML = slice.map((ad, i) => renderCard(ad, start + i)).join('');
+    renderPagination();
+  }
+
+  function renderCard(ad, idx) {
+    const sn = ad.snapshot || {};
+    const isActive = ad.is_active;
+    const platforms = (ad.publisher_platform || []).slice(0, 3);
+    const avatarUrl = sn.page_profile_picture_url || '';
+    const format = getAdFormat(ad);
+    const adIsDpa = isDpa(ad);
+
+    // FIX: Urutan fallback preview yang benar:
+    // 1. Video thumbnail (jika ada)
+    // 2. Image snapshot
+    // 3. Cards image (penting untuk DPA — gambar produk ada di cards[])
+    // 4. Cards video thumbnail (DPA video)
+    // 5. Fallback: video URL langsung (beberapa video tidak punya thumbnail)
+    const previewUrl = sn.videos?.[0]?.video_preview_image_url
+      || sn.images?.[0]?.resized_image_url
+      || sn.images?.[0]?.original_image_url
+      || sn.cards?.[0]?.resized_image_url
+      || sn.cards?.[0]?.original_image_url
+      || sn.cards?.[0]?.video_preview_image_url
+      || '';
+
+    // Untuk video tanpa thumbnail, gunakan video URL langsung
+    const videoDirectUrl = !sn.videos?.[0]?.video_preview_image_url
+      ? (sn.videos?.[0]?.video_sd_url || sn.videos?.[0]?.video_hd_url || '')
+      : '';
+
+    // FIX: Untuk DPA, ambil title produk asli dari cards[0].title
+    // jika snapshot.title adalah template {{product.name}}
+    const rawTitle = sn.title || '';
+    const cardTitle = (sn.cards?.[0]?.title) || '';
+    const cardBody = (sn.cards?.[0]?.body) || '';
+    // Gunakan judul dari card pertama jika title utama adalah template DPA
+    const displayTitleText = isDpaTemplate(rawTitle) && cardTitle ? cardTitle : rawTitle;
+
+    const title = rawTitle;  // simpan raw untuk keperluan lain
+    const body = sn.body?.text || cardBody || '';
+    const linkUrl = sn.link_url || sn.cards?.[0]?.link_url || '';
+    const ctaText = sn.cta_text || sn.cards?.[0]?.cta_text || '';
+    const startDate = ad.start_date_formatted?.split(' ')[0] || '—';
+    const endDate = ad.end_date_formatted?.split(' ')[0] || '—';
+    const likes = (sn.page_like_count || 0).toLocaleString('id-ID');
+    const caption = sn.caption || sn.cards?.[0]?.caption || '';
+
+    const adId = String(ad.ad_archive_id || '');
+    const isBookmarked = bookmarkedIds.has(adId);
+
+    let previewHtml;
+    if (format === 'VIDEO' && videoDirectUrl && !previewUrl) {
+      // Video tanpa thumbnail — tampilkan video langsung
+      previewHtml = '<video muted preload="none" style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer" onclick="this.paused?this.play():this.pause()" onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0"><source src="' + videoDirectUrl + '" type="video/mp4"></video>';
+    } else if (adIsDpa && !previewUrl) {
+      // DPA tanpa gambar sama sekali (seharusnya tidak terjadi lagi setelah fix di atas)
+      previewHtml = '<div class="ad-preview-dpa"><div class="dpa-icon">🛒</div><div class="dpa-label">Dynamic Product Ad</div><div class="dpa-sub">Preview otomatis dari katalog produk</div></div>';
+    } else if (previewUrl) {
+      previewHtml = '<img src="' + previewUrl + '" alt="preview" onerror="this.parentElement.innerHTML=\'<div class=ad-preview-placeholder>' + (format === 'VIDEO' ? '🎬' : format === 'IMAGE' ? '🖼' : adIsDpa ? '🛒' : '📋') + '</div>\'">';
+    } else {
+      previewHtml = '<div class="ad-preview-placeholder">' + (format === 'VIDEO' ? '🎬' : format === 'IMAGE' ? '🖼' : '📋') + '</div>';
+    }
+
+    const ws = calcWinningScore(ad);
+    const wsClass = ws >= 80 ? 'ws-high' : ws >= 50 ? 'ws-mid' : 'ws-low';
+    const wsEmoji = ws >= 80 ? '🏆' : ws >= 50 ? '⭐' : '·';
+    const wsTrending = isTrending(ad);
+    const wsDuplicate = isDuplicate(ad);
+    const wsPlatformLabel = getPlatformLabel(ad.publisher_platform);
+    const wsDaysActive = ad.start_date ? Math.floor((TODAY_TS - ad.start_date) / 86400) : 0;
+
+    const badgeHtml = '<div class="ad-card-badges">' +
+      '<span class="ws-badge ' + wsClass + '">' + wsEmoji + ' ' + ws + '</span>' +
+      (wsTrending ? '<span class="pill-trend">🔥 Trending</span>' : '') +
+      (wsDuplicate ? '<span class="pill-scale">🔄 Scale</span>' : '') +
+      (adIsDpa ? '<span class="pill-dpa">🛒 DPA</span>' : '') +
+      '<span class="pill-platform">' + wsPlatformLabel + '</span>' +
+      '<span class="like-count" style="margin-left:auto"><span>' + likes + '</span> likes · ' + wsDaysActive + ' hr</span>' +
+    '</div>';
+
+    // FIX: Jika title adalah template DPA {{product.name}}, tampilkan judul produk asli dari cards
+    const titleDisplay = rawTitle
+      ? (isDpaTemplate(rawTitle)
+          ? (displayTitleText
+              // Ada judul produk asli dari cards → tampilkan dengan badge DPA kecil
+              ? '<div class="ad-title">' + escHtml(displayTitleText) + ' <span style="font-size:9px;background:#fdf4ff;color:#7e22ce;border:1px solid #e9d5ff;padding:1px 6px;border-radius:999px;font-weight:600;vertical-align:middle;font-family:\'DM Sans\',sans-serif">DPA</span></div>'
+              // Tidak ada judul dari cards, tampilkan template
+              : '<div class="ad-title dpa-template">🛒 ' + escHtml(rawTitle) + '</div>')
+          : '<div class="ad-title">' + escHtml(rawTitle) + '</div>')
+      : '<div class="ad-title" style="color:var(--muted);font-style:italic;font-size:12px">(Tanpa Judul)</div>';
+
+    const linkBtn = linkUrl
+      ? '<button class="btn-action btn-landing" onclick="showLanding(\'' + linkUrl.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\', \'' + escHtml(title).replace(/'/g,"\\'") + '\')">🌐 Landing Page</button>'
+      : '<button class="btn-action btn-landing" disabled style="opacity:0.35;cursor:not-allowed;">🌐 Tidak Ada URL</button>';
+
+    const adlibBtn = ad.ad_library_url
+      ? '<button class="btn-action btn-adlib" onclick="window.open(\'' + ad.ad_library_url + '\',\'_blank\')">📚 Ads Library</button>'
+      : '<button class="btn-action btn-adlib" disabled style="opacity:0.35;cursor:not-allowed;">📚 Ads Library</button>';
+
+    const fbPageBtn = sn.page_profile_uri
+      ? '<button class="btn-action btn-fbpage" onclick="window.open(\'' + sn.page_profile_uri + '\',\'_blank\')">👤 Halaman FB</button>'
+      : '<button class="btn-action btn-fbpage" disabled style="opacity:0.35;cursor:not-allowed;">👤 Halaman FB</button>';
+
+    const fmtBadgeClass = adIsDpa ? 'ad-format-badge badge-dpa' : 'ad-format-badge';
+
+    return '<div class="ad-card" style="animation-delay:' + ((idx % PER_PAGE) * 0.04) + 's">' +
+      '<div class="ad-card-header">' +
+        '<img class="page-avatar" src="' + avatarUrl + '" alt="" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%23f4f4f5%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2218%22>📄</text></svg>\'">' +
+        '<div class="page-info">' +
+          '<div class="page-name" title="' + escHtml(ad.page_name || '') + '">' + escHtml(ad.page_name || '—') + '</div>' +
+          '<div class="page-meta">' + (caption ? escHtml(caption) : '') + '</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">' +
+          '<div class="ad-status ' + (isActive ? 'status-active' : 'status-inactive') + '">' +
+            '<div class="status-dot"></div>' + (isActive ? 'Aktif' : 'Nonaktif') +
+          '</div>' +
+          '<div style="display:flex;gap:4px">' +
+            '<button class="btn-bookmark' + (isBookmarked ? ' bookmarked' : '') + '" onclick="toggleBookmark(\'' + adId + '\', this)" title="' + (isBookmarked ? 'Hapus bookmark' : 'Simpan bookmark') + '">' +
+              (isBookmarked ? '🔖 Tersimpan' : '🔖 Simpan') +
+            '</button>' +
+            '<button class="btn-hide-advertiser" data-hide-page-name="' + escHtml(ad.page_name || '') + '" data-hide-page-id="' + escHtml(ad.page_id || '') + '">🚫 Hide</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      badgeHtml +
+      '<div class="ad-preview">' +
+        previewHtml +
+        '<div class="' + fmtBadgeClass + '">' + format + '</div>' +
+      '</div>' +
+      '<div class="ad-content">' +
+        titleDisplay +
+        '<div class="ad-body">' + escHtml(body) + '</div>' +
+        (linkUrl ? '<a class="ad-link" href="' + linkUrl + '" target="_blank" rel="noopener">↗ ' + escHtml(linkUrl) + '</a>' : '') +
+        '<div class="tags">' +
+          platforms.map(p => '<span class="tag platform">' + p + '</span>').join('') +
+          (ctaText ? '<span class="tag cta">' + escHtml(ctaText) + '</span>' : '') +
+          (sn.page_categories || []).slice(0,2).map(c => '<span class="tag">' + escHtml(c) + '</span>').join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="ad-footer">' +
+        '<div class="date-range"><strong>' + startDate + '</strong>→ ' + endDate + '</div>' +
+        '<div class="ad-id" onclick="showRawJsonForAd(' + idx + ')">#' + adId.slice(-8) + '</div>' +
+      '</div>' +
+      '<div class="ad-actions">' +
+        '<button class="btn-action btn-konten" onclick="showKonten(' + idx + ')">🎬 Lihat Konten</button>' +
+        linkBtn + adlibBtn + fbPageBtn +
+      '</div>' +
+      '<button class="ad-expand-btn" onclick="toggleDetail(this)"><span>▾</span> Detail</button>' +
+      '<div class="ad-detail">' +
+        '<div class="detail-row"><span class="detail-key">Archive ID</span><span class="detail-val">' + (ad.ad_archive_id || '—') + '</span></div>' +
+        '<div class="detail-row"><span class="detail-key">Page ID</span><span class="detail-val">' + (ad.page_id || '—') + '</span></div>' +
+        '<div class="detail-row"><span class="detail-key">Format</span><span class="detail-val">' + format + '</span></div>' +
+        '<div class="detail-row"><span class="detail-key">Winning Score</span><span class="detail-val"><strong>' + ws + '</strong>/100</span></div>' +
+        '<div class="detail-row"><span class="detail-key">Platforms</span><span class="detail-val">' + ((ad.publisher_platform || []).join(', ') || '—') + '</span></div>' +
+        '<div class="detail-row"><span class="detail-key">Collation Count</span><span class="detail-val">' + (ad.collation_count || 1) + '</span></div>' +
+        '<div class="detail-row"><span class="detail-key">Ad Library</span><span class="detail-val"><a class="ad-link" style="margin:0" href="' + (ad.ad_library_url || '#') + '" target="_blank">Buka di FB Ad Library ↗</a></span></div>' +
+        '<div style="margin-top:10px"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px" onclick="showRawJsonForAd(' + idx + ')">Lihat Raw JSON</button></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function toggleDetail(btn) {
+    const detail = btn.nextElementSibling;
+    detail.classList.toggle('open');
+    btn.querySelector('span').innerHTML = detail.classList.contains('open') ? '▴' : '▾';
+    btn.childNodes[1].textContent = detail.classList.contains('open') ? ' Sembunyikan' : ' Detail';
+  }
+
+  function renderPagination() {
+    const totalPages = Math.ceil(filteredData.length / PER_PAGE);
+    const pg = document.getElementById('pagination');
+    if (totalPages <= 1) { pg.innerHTML = ''; return; }
+    let html = '<button class="page-btn" onclick="goPage(' + (currentPage-1) + ')" ' + (currentPage===1?'disabled':'') + '>← Prev</button>';
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, currentPage + 2);
+    if (start > 1) html += '<button class="page-btn" onclick="goPage(1)">1</button>' + (start > 2 ? '<span style="color:var(--muted);padding:0 4px">…</span>' : '');
+    for (let i = start; i <= end; i++) html += '<button class="page-btn' + (i===currentPage?' active':'') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+    if (end < totalPages) html += (end < totalPages-1 ? '<span style="color:var(--muted);padding:0 4px">…</span>' : '') + '<button class="page-btn" onclick="goPage(' + totalPages + ')">' + totalPages + '</button>';
+    html += '<button class="page-btn" onclick="goPage(' + (currentPage+1) + ')" ' + (currentPage===totalPages?'disabled':'') + '>Next →</button>';
+    html += '<span style="font-size:11px;color:var(--muted);margin-left:6px">' + currentPage + '/' + totalPages + '</span>';
+    pg.innerHTML = html;
+  }
+
+  function goPage(p) {
+    const totalPages = Math.ceil(filteredData.length / PER_PAGE);
+    if (p < 1 || p > totalPages) return;
+    currentPage = p;
+    renderPage();
+    window.scrollTo({ top: document.getElementById('statsSection').offsetTop - 70, behavior: 'smooth' });
+  }
+
+  function showRawJsonForAd(idx) {
+    const ad = filteredData[idx];
+    if (!ad) return;
+    document.getElementById('modalTitle').textContent = 'Raw JSON — ' + (ad.page_name || ad.ad_archive_id);
+    document.getElementById('modalContent').textContent = JSON.stringify(ad, null, 2);
+    openModal('modalBg');
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modalBg')) closeModalById('modalBg');
+  }
+
+  function showKonten(idx) {
+    const ad = filteredData[idx];
+    if (!ad) return;
+    const sn = ad.snapshot || {};
+    document.getElementById('contentModalTitle').textContent = 'Konten Iklan — ' + (ad.page_name || '');
+    const format = getAdFormat(ad);
+    const adIsDpa = isDpa(ad);
+    const videos = sn.videos || [];
+    const images = sn.images || [];
+    const cards = sn.cards || [];
+    const avatarUrl = sn.page_profile_picture_url || '';
+    const rawTitle = sn.title || '';
+    // FIX: Untuk DPA, ambil judul produk asli dari cards[0] jika title adalah template
+    const realTitle = (isDpaTemplate(rawTitle) && cards[0]?.title) ? cards[0].title : rawTitle;
+    const title = realTitle;
+    const body = sn.body?.text || cards[0]?.body || '';
+    const caption = sn.caption || cards[0]?.caption || '';
+    const linkUrl = sn.link_url || cards[0]?.link_url || '';
+    const linkDesc = sn.link_description || '';
+    const ctaText = sn.cta_text || cards[0]?.cta_text || '';
+    const platforms = (ad.publisher_platform || []);
+    const startDate = ad.start_date_formatted?.split(' ')[0] || '—';
+    const endDate = ad.end_date_formatted?.split(' ')[0] || '—';
+
+    let mediaHtml = '';
+    // FIX: VIDEO — gunakan video langsung meski tidak ada thumbnail
+    if (format === 'VIDEO' && videos.length > 0) {
+      const v = videos[0];
+      const activeUrl = v.video_sd_url || v.video_hd_url || '';
+      const thumb = v.video_preview_image_url || '';
+      mediaHtml = activeUrl
+        ? '<div class="media-preview-wrap"><video controls preload="metadata" poster="' + thumb + '" style="width:100%;max-height:360px;display:block;background:#000"><source src="' + activeUrl + '" type="video/mp4">Browser tidak mendukung video.</video></div>'
+        : '<div class="media-preview-wrap" style="height:120px"><div class="media-placeholder-big">🎬</div></div>';
+    } else if (format === 'IMAGE' && images.length > 0) {
+      const imgUrl = images[0].resized_image_url || images[0].original_image_url || '';
+      mediaHtml = imgUrl
+        ? '<div class="media-preview-wrap"><img src="' + imgUrl + '" alt="image" style="max-height:400px;width:100%;object-fit:contain"></div>'
+        : '<div class="media-preview-wrap" style="height:120px"><div class="media-placeholder-big">🖼</div></div>';
+    // FIX: DPA/CAROUSEL — tampilkan gambar dari cards + strip produk
+    } else if (cards.length > 0) {
+      const fc = cards[0];
+      const fcImg = fc.resized_image_url || fc.original_image_url || '';
+      const fcVid = fc.video_sd_url || fc.video_hd_url || '';
+      const fcThumb = fc.video_preview_image_url || '';
+      if (fcVid) {
+        mediaHtml = '<div class="media-preview-wrap"><video controls preload="metadata" poster="' + fcThumb + '" style="width:100%;max-height:360px;display:block;background:#000"><source src="' + fcVid + '" type="video/mp4">Browser tidak mendukung video.</video></div>';
+      } else if (fcImg) {
+        mediaHtml = '<div class="media-preview-wrap"><img id="dpaMainImg" src="' + fcImg + '" alt="produk" style="max-height:360px;width:100%;object-fit:contain"></div>';
+      } else {
+        mediaHtml = '<div class="media-preview-wrap" style="height:120px"><div class="media-placeholder-big">🛒</div></div>';
+      }
+      // Strip semua produk DPA sebagai carousel yang bisa diklik
+      if (cards.length > 1) {
+        const strips = cards.map((c, i) => {
+          const cImg = c.resized_image_url || c.original_image_url || c.video_preview_image_url || '';
+          const cTitle = c.title || '(produk ' + (i+1) + ')';
+          const cPrice = c.link_description || '';
+          return '<div class="carousel-item" onclick="var m=document.getElementById(\'dpaMainImg\');if(m&&\'' + cImg + '\'){m.src=\'' + cImg + '\'}">' +
+            (cImg ? '<img src="' + cImg + '" alt="' + escHtml(cTitle) + '" onerror="this.style.display=\'none\'">' : '<div style="height:84px;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--surface2)">🛒</div>') +
+            '<div class="carousel-item-label">' + escHtml(cTitle) + (cPrice ? ' · ' + escHtml(cPrice) : '') + '</div></div>';
+        }).join('');
+        mediaHtml += '<div class="carousel-strip"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;align-self:center;flex-shrink:0;padding-right:8px">' + cards.length + ' Produk</div>' + strips + '</div>';
+      }
+    }
+    if (!mediaHtml) {
+      mediaHtml = adIsDpa
+        ? '<div class="media-preview-wrap" style="height:160px;background:linear-gradient(135deg,#fdf4ff,#f5f3ff)"><div style="text-align:center"><div style="font-size:44px;margin-bottom:12px">🛒</div><div style="font-size:13px;color:#7e22ce;font-weight:600">Dynamic Product Ad</div></div></div>'
+        : '<div class="media-preview-wrap" style="height:100px"><div class="media-placeholder-big">📋</div></div>';
+    }
+
+    const metaChips = [
+      '<span class="chip chip-gray">📅 '+startDate+' → '+endDate+'</span>',
+      '<span class="chip '+(ad.is_active?'chip-green':'chip-orange')+'">'+(ad.is_active?'● Aktif':'● Nonaktif')+'</span>',
+      '<span class="chip chip-blue">'+format+'</span>',
+      (adIsDpa ? '<span class="chip chip-purple">🛒 DPA · '+cards.length+' produk</span>' : ''),
+      ...platforms.map(p=>'<span class="chip chip-blue">'+p+'</span>')
+    ].filter(Boolean).join('');
+
+    let linkBoxHtml = '';
+    if (linkUrl) {
+      linkBoxHtml = '<a class="content-link-box" href="' + linkUrl + '" target="_blank" rel="noopener"><div class="content-link-icon">🔗</div><div class="content-link-info"><div class="content-link-title">' + escHtml(linkDesc || title || 'Lihat Lebih Lanjut') + '</div><div class="content-link-url">' + escHtml(linkUrl) + '</div></div>' + (ctaText ? '<span class="content-cta-btn">' + escHtml(ctaText) + '</span>' : '') + '</a>';
+    }
+
+    document.getElementById('contentModalBody').innerHTML =
+      mediaHtml +
+      '<div class="content-text-area">' +
+        '<div class="content-page-info">' +
+          '<img class="content-page-avatar" src="' + avatarUrl + '" alt="" onerror="this.style.display=\'none\'">' +
+          '<div><div class="content-page-name">' + escHtml(ad.page_name || '—') + '</div><div class="content-page-sub">' + (caption ? escHtml(caption) : '') + '</div></div>' +
+        '</div>' +
+        (title ? '<div class="content-ad-title">' + escHtml(title) + '</div>' : '') +
+        (body ? '<div class="content-ad-body">' + escHtml(body) + '</div>' : '') +
+        linkBoxHtml +
+        '<div class="content-meta-chips" style="margin-top:14px">' + metaChips + '</div>' +
+      '</div>';
+
+    openModal('contentModalBg');
+  }
+
+  function closeContentModal(e) {
+    if (e.target === document.getElementById('contentModalBg')) {
+      document.querySelectorAll('#contentModalBody video').forEach(v => v.pause());
+      closeModalById('contentModalBg');
+    }
+  }
+
+  let _currentLandingUrl = '';
+
+  function showLanding(url, title) {
+    if (!url) { showToast('Tidak ada URL landing page'); return; }
+    _currentLandingUrl = url;
+    document.getElementById('landingModalTitle').textContent = 'Landing Page — ' + (title || url);
+    document.getElementById('landingUrlBar').textContent = url;
+    document.getElementById('landingOpenBtn').href = url;
+    const container = document.getElementById('landingIframeContainer');
+    container.innerHTML = '<div class="iframe-blocker"><div class="iframe-blocker-icon">🌐</div><h3>Buka Landing Page</h3><p>Sebagian besar website memblokir tampilan dalam iframe. Gunakan tombol di bawah untuk membuka halaman di tab baru.</p><div class="url-display">' + escHtml(url) + '</div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn-open-external" href="' + url + '" target="_blank" rel="noopener">↗ Buka di Tab Baru</a><button class="btn-copy-url" onclick="copyLandingUrl()">Salin URL</button></div></div>';
+    openModal('landingModalBg');
+  }
+
+  function copyLandingUrl() {
+    if (!_currentLandingUrl) return;
+    navigator.clipboard.writeText(_currentLandingUrl).then(() => showToast('URL berhasil disalin!', true)).catch(() => showToast('Gagal menyalin URL'));
+  }
+
+  function closeLandingModal(e) {
+    if (e.target === document.getElementById('landingModalBg')) closeLandingModalDirect();
+  }
+
+  function closeLandingModalDirect() {
+    closeModalById('landingModalBg');
+    document.getElementById('landingIframeContainer').innerHTML = '';
+    _currentLandingUrl = '';
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModalById(id) {
+    document.getElementById(id).classList.remove('open');
+    if (!document.querySelector('.modal-bg.open, .info-modal-bg.open')) document.body.classList.remove('modal-open');
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showToast(msg, success = false) {
+    const t = document.getElementById('toast');
+    t.innerHTML = msg;
+    t.style.display = 'block';
+    t.style.borderColor = success ? '#bbf7d0' : '#fca5a5';
+    t.style.color = success ? '#16a34a' : '#dc2626';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  function clearAll() {
+    allData = []; filteredData = [];
+    document.getElementById('adsGrid').innerHTML = '';
+    document.getElementById('statsSection').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('dataSource').textContent = '';
+    excludedAdvertisers.clear(); excludedMeta = {};
+    excludedUrls.clear();
+    renderExcludePanel();
+    renderExcludeUrlPanel();
+    const ss = document.getElementById('scraperStatus');
+    if (ss) ss.classList.remove('visible');
+    setRunBtn(false, '&#9654;', 'Run Machine');
+    try { localStorage.removeItem(LS_DATA); sessionStorage.removeItem(LS_DATA); } catch(e) {}
+    showToast('Data dihapus');
+  }
+</script>
+</body>
+</html>
