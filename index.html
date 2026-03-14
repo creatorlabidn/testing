@@ -2528,6 +2528,43 @@
   .btn-col-remove:hover { background: rgba(232,40,74,0.1); }
   .btn-col-adlib { background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; font-size: 13px; font-weight: 600; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; transition: background 0.15s; flex-shrink: 0; }
   .btn-col-adlib:hover { background: #ffedd5; }
+
+  /* ─── UPLOAD JSON ─────────────────────────────────────────── */
+  .upload-dropzone {
+    border: 2px dashed var(--border2);
+    border-radius: 10px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .upload-dropzone:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .upload-dropzone.dragover { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.01); }
+  .upload-dz-icon { font-size: 32px; line-height: 1; }
+  .upload-dz-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .upload-dz-sub { font-size: 11px; color: var(--muted); }
+  .upload-status {
+    margin-top: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .upload-status-row { display: flex; align-items: center; gap: 10px; }
+  .upload-status-icon { font-size: 18px; flex-shrink: 0; }
+  .upload-status-info { flex: 1; min-width: 0; }
+  .upload-status-text { font-size: 12px; font-weight: 600; color: var(--text); }
+  .upload-status-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .upload-progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .upload-progress-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.4s ease; width: 0%; }
   .note-editor { display: none; padding: 7px 9px; border-top: 1px solid #fde68a; background: #fffbeb; }
   .note-editor.open { display: block; }
   .note-ta { width: 100%; background: var(--bg); border: 1px solid #fde68a; border-radius: 5px; padding: 5px 8px; font-size: 11px; font-family: 'DM Sans', sans-serif; resize: none; outline: none; color: var(--text); min-height: 50px; }
@@ -2924,6 +2961,47 @@
           <a href="https://console.apify.com/account/integrations" target="_blank" rel="noopener">Buat di Apify Console &#8594;</a>
         </div>
       </div>
+
+      <!-- UPLOAD JSON SECTION -->
+      <div class="settings-section">
+        <div class="settings-section-label">Upload Data JSON Manual</div>
+        <div class="settings-section-desc">
+          Upload file JSON hasil export dari Facebook Ads Library Scraper (Apify). Data akan langsung dimuat ke dashboard tanpa perlu run ulang.
+        </div>
+
+        <!-- Drop zone -->
+        <div class="upload-dropzone" id="uploadDropzone"
+          onclick="document.getElementById('jsonFileInput').click()"
+          ondragover="handleDragOver(event)"
+          ondragleave="handleDragLeave(event)"
+          ondrop="handleFileDrop(event)">
+          <div class="upload-dz-icon">📂</div>
+          <div class="upload-dz-title">Klik atau drag & drop file JSON</div>
+          <div class="upload-dz-sub">Format: dataset_facebook-ads-library-scraper_*.json</div>
+          <input type="file" id="jsonFileInput" accept=".json" style="display:none" onchange="handleFileSelect(event)">
+        </div>
+
+        <!-- Status upload -->
+        <div class="upload-status" id="uploadStatus" style="display:none">
+          <div class="upload-status-row">
+            <span class="upload-status-icon" id="uploadStatusIcon">⏳</span>
+            <div class="upload-status-info">
+              <div class="upload-status-text" id="uploadStatusText">Memproses...</div>
+              <div class="upload-status-sub" id="uploadStatusSub"></div>
+            </div>
+          </div>
+          <div class="upload-progress-bar">
+            <div class="upload-progress-fill" id="uploadProgressFill"></div>
+          </div>
+        </div>
+
+        <div class="settings-hint" style="margin-top:10px">
+          💡 Cara dapat file JSON: jalankan scraper di
+          <a href="https://apify.com/curious_coder/facebook-ads-library-scraper" target="_blank" rel="noopener">Apify ↗</a>
+          lalu download dataset sebagai JSON.
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -3655,6 +3733,9 @@
     const inp = document.getElementById('settingsToken');
     inp.value = t;
     updateSettingsTokenStatus(t ? 'saved' : 'empty');
+    // Reset upload status
+    const uploadStatus = document.getElementById('uploadStatus');
+    if (uploadStatus) uploadStatus.style.display = 'none';
     modal.classList.add('open');
     document.body.classList.add('modal-open');
   }
@@ -4841,6 +4922,124 @@
     t.style.color = success ? '#16a34a' : '#dc2626';
     clearTimeout(t._timer);
     t._timer = setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  // ─── UPLOAD JSON MANUAL ───────────────────────────────────────
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById('uploadDropzone').classList.add('dragover');
+  }
+
+  function handleDragLeave(e) {
+    e.preventDefault();
+    document.getElementById('uploadDropzone').classList.remove('dragover');
+  }
+
+  function handleFileDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById('uploadDropzone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) processJsonFile(file);
+  }
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) processJsonFile(file);
+    // Reset input supaya file yang sama bisa di-upload ulang
+    e.target.value = '';
+  }
+
+  function setUploadStatus(icon, text, sub, progress) {
+    const statusEl = document.getElementById('uploadStatus');
+    const iconEl   = document.getElementById('uploadStatusIcon');
+    const textEl   = document.getElementById('uploadStatusText');
+    const subEl    = document.getElementById('uploadStatusSub');
+    const fillEl   = document.getElementById('uploadProgressFill');
+    statusEl.style.display = 'flex';
+    iconEl.textContent  = icon;
+    textEl.textContent  = text;
+    subEl.textContent   = sub || '';
+    fillEl.style.width  = (progress || 0) + '%';
+  }
+
+  function processJsonFile(file) {
+    // Validasi ekstensi
+    if (!file.name.endsWith('.json')) {
+      setUploadStatus('❌', 'File harus berformat .json', 'Pilih file JSON dari Apify dataset', 0);
+      return;
+    }
+
+    setUploadStatus('⏳', 'Membaca file...', file.name, 20);
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      setUploadStatus('⏳', 'Memproses data...', 'Parsing JSON...', 50);
+
+      // Gunakan setTimeout agar UI sempat update dulu
+      setTimeout(() => {
+        try {
+          const raw = e.target.result;
+          let parsed;
+
+          try {
+            parsed = JSON.parse(raw);
+          } catch(parseErr) {
+            setUploadStatus('❌', 'Format JSON tidak valid', 'Pastikan file adalah export langsung dari Apify', 0);
+            return;
+          }
+
+          // Apify bisa return array langsung atau object dengan key data/items
+          let data = null;
+          if (Array.isArray(parsed)) {
+            data = parsed;
+          } else if (parsed && Array.isArray(parsed.data)) {
+            data = parsed.data;
+          } else if (parsed && Array.isArray(parsed.items)) {
+            data = parsed.items;
+          } else {
+            setUploadStatus('❌', 'Struktur JSON tidak dikenali', 'File harus berupa array data iklan dari Apify', 0);
+            return;
+          }
+
+          if (data.length === 0) {
+            setUploadStatus('⚠️', 'File kosong', 'Tidak ada data iklan di file ini', 0);
+            return;
+          }
+
+          // Validasi — cek apakah ada field yang dikenali
+          const sample = data[0];
+          const hasAdFields = sample.ad_archive_id || sample.page_name || sample.snapshot;
+          if (!hasAdFields) {
+            setUploadStatus('❌', 'Data tidak dikenali', 'Pastikan file berasal dari Facebook Ads Library Scraper', 0);
+            return;
+          }
+
+          setUploadStatus('⏳', 'Memuat ke dashboard...', data.length + ' iklan ditemukan', 80);
+
+          setTimeout(() => {
+            setUploadStatus('✅', data.length + ' iklan berhasil dimuat!', file.name, 100);
+            // Tutup settings modal dan load data
+            closeSettingsModalDirect();
+            loadData(data);
+            // Update source label
+            const banner = document.getElementById('dataSource');
+            if (banner) banner.textContent = data.length + ' iklan (dari file: ' + file.name + ')';
+          }, 300);
+
+        } catch(err) {
+          setUploadStatus('❌', 'Gagal memproses file', err.message, 0);
+        }
+      }, 50);
+    };
+
+    reader.onerror = function() {
+      setUploadStatus('❌', 'Gagal membaca file', 'Coba pilih file lain', 0);
+    };
+
+    reader.readAsText(file, 'UTF-8');
   }
 
   function clearAll() {
