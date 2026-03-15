@@ -2531,78 +2531,15 @@
   .btn-col-adlib:hover { background: #ffedd5; }
 
   /* ─── SCRAPER FORM BUILDER ───────────────────────────────── */
-  .scraper-tab {
-    background: transparent;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 5px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .scraper-tab.active {
-    background: var(--bg);
-    color: var(--text);
-    font-weight: 700;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  }
-  .scraper-tab:hover:not(.active) { color: var(--text); }
-
   .scraper-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 12px;
-    padding: 16px 20px 12px;
+    padding: 16px 20px 14px;
   }
   @media (max-width: 800px) { .scraper-form-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 540px) { .scraper-form-grid { grid-template-columns: 1fr; } }
 
-  .url-preview-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px 14px;
-    flex-wrap: wrap;
-  }
-  .url-preview-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    flex-shrink: 0;
-  }
-  .url-preview-box {
-    flex: 1;
-    min-width: 0;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 7px 11px;
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    color: #7c3aed;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .url-preview-copy {
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 11px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .url-preview-copy:hover { border-color: var(--accent); color: var(--accent); }
   .upload-dropzone {
     border: 2px dashed var(--border2);
     border-radius: 10px;
@@ -2707,11 +2644,6 @@
   <div class="scraper-panel">
     <div class="scraper-panel-header">
       <div class="hero-label" style="margin:0">Facebook Ad Library</div>
-      <!-- Tab switcher -->
-      <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:2px;">
-        <button class="scraper-tab active" id="tabForm" onclick="switchScraperTab('form')">🔧 Form Builder</button>
-        <button class="scraper-tab" id="tabUrl" onclick="switchScraperTab('url')">🔗 Manual URL</button>
-      </div>
     </div>
 
     <!-- FORM BUILDER -->
@@ -2796,25 +2728,7 @@
         </div>
 
       </div>
-
-      <!-- URL Preview -->
-      <div class="url-preview-row">
-        <div class="url-preview-label">🔗 URL yang akan digunakan:</div>
-        <div class="url-preview-box" id="urlPreviewBox">—</div>
-        <button class="url-preview-copy" onclick="copyGeneratedUrl()" title="Salin URL">📋 Salin</button>
-      </div>
-    </div>
-
-    <!-- MANUAL URL (tersembunyi by default) -->
-    <div id="scraperUrlPanel" style="display:none">
-      <div class="scraper-body">
-        <div class="scraper-field" style="grid-column: 1 / -1; max-width: none;">
-          <span class="scraper-label">Ads Library URL</span>
-          <input type="text" class="scraper-input" id="apifyUrl"
-            placeholder="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ID&q=..."
-            oninput="syncUrlToForm()">
-        </div>
-      </div>
+      <input type="hidden" id="apifyUrl">
     </div>
 
     <div class="scraper-advanced-row">
@@ -4016,22 +3930,17 @@
     const token = getToken();
     const count = parseInt(document.getElementById('apifyCount').value) || 100;
 
-    // Ambil URL dari form builder (jika tab aktif = form) atau manual URL
-    let url;
-    if (_activeScraperTab === 'form') {
-      url = buildAdLibraryUrl(); // generate fresh dari form
-    } else {
-      url = document.getElementById('apifyUrl').value.trim();
-    }
+    // Selalu generate URL dari form builder
+    const url = buildAdLibraryUrl();
 
     if (!token) {
       showToast('Token belum diset — buka Settings dulu!');
       openSettings();
       return;
     }
-    if (!url || url === '—') {
-      showToast('Masukkan keyword atau URL dulu!');
-      document.getElementById(_activeScraperTab === 'form' ? 'formKeyword' : 'apifyUrl').focus();
+    if (!url) {
+      showToast('Masukkan keyword dulu!');
+      document.getElementById('formKeyword').focus();
       return;
     }
 
@@ -5109,21 +5018,6 @@
   }
 
   // ─── SCRAPER FORM BUILDER ────────────────────────────────────
-  let _activeScraperTab = 'form';
-
-  function switchScraperTab(tab) {
-    _activeScraperTab = tab;
-    document.getElementById('scraperFormPanel').style.display = tab === 'form' ? 'block' : 'none';
-    document.getElementById('scraperUrlPanel').style.display  = tab === 'url'  ? 'block' : 'none';
-    document.getElementById('tabForm').classList.toggle('active', tab === 'form');
-    document.getElementById('tabUrl').classList.toggle('active',  tab === 'url');
-    // Saat pindah ke tab URL, sync URL dari form
-    if (tab === 'url') {
-      const url = buildAdLibraryUrl();
-      document.getElementById('apifyUrl').value = url;
-    }
-  }
-
   function buildAdLibraryUrl() {
     const country    = document.getElementById('formCountry')?.value    || 'ID';
     const keyword    = document.getElementById('formKeyword')?.value    || '';
@@ -5159,24 +5053,6 @@
 
     return url;
   }
-
-  function syncUrlToForm() {
-    // Saat user edit manual URL, update apifyUrl saja (tidak perlu sync ke form)
-    // apifyUrl sudah langsung terbaca oleh runApifyScraper()
-  }
-
-  function copyGeneratedUrl() {
-    const url = document.getElementById('urlPreviewBox')?.textContent;
-    if (!url || url === '—') return;
-    navigator.clipboard.writeText(url)
-      .then(() => showToast('✓ URL berhasil disalin!', true))
-      .catch(() => showToast('Gagal menyalin URL'));
-  }
-
-  // Build URL saat halaman load
-  (function initFormBuilder() {
-    setTimeout(buildAdLibraryUrl, 100);
-  })();
 
   // ─── UPLOAD JSON MANUAL ───────────────────────────────────────
   function handleDragOver(e) {
