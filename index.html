@@ -3270,7 +3270,7 @@
   // ─── LOGIN SYSTEM ─────────────────────────────────────────────
   // Webhook URLs (logika dari referensi login HTML)
   var WEBHOOK_URL        = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/e7692752-5f97-46da-b82d-646c9030e3f5';
-  var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
+  var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
   const LS_SESSION = 'adspy_session';
 
   var _loginEmail     = '';
@@ -3425,40 +3425,65 @@
 
   // ── Step 2: Verify OTP ──
   function verifyOTP() {
-    const otp = getOtpValue();
+    var otp = getOtpValue();
     hideLoginError('loginOtpError');
 
     if (otp.length < 6) {
       showLoginError('loginOtpError', 'Masukkan 6 digit kode OTP.');
-      shakeOtpBoxes(); return;
+      shakeOtpBoxes();
+      return;
     }
 
-    const btn = document.getElementById('loginVerifyBtn');
-    btn.disabled = true; btn.textContent = 'Memverifikasi...';
+    var btn = document.getElementById('loginVerifyBtn');
+    btn.disabled = true;
+    btn.textContent = 'Memverifikasi...';
+
+    var payload = JSON.stringify({
+      action: 'verify_otp',
+      email: _loginEmail,
+      otp: otp,
+      timestamp: new Date().toISOString()
+    });
+
+    console.log('[AdSpy] POST verify OTP to:', WEBHOOK_OTP_VERIFY);
+    console.log('[AdSpy] Payload:', payload);
 
     fetch(WEBHOOK_OTP_VERIFY, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'verify_otp', email: _loginEmail, otp: otp, timestamp: new Date().toISOString() })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'cors',
+      body: payload
     })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      btn.disabled = false; btn.textContent = 'Verifikasi & Masuk';
-      if (data && data.success === true) {
+    .then(function(res) {
+      console.log('[AdSpy] HTTP status:', res.status);
+      return res.text().then(function(text) {
+        console.log('[AdSpy] Response body:', text);
+        var data = {};
+        try { data = JSON.parse(text); } catch(e) {}
+        return { status: res.status, data: data };
+      });
+    })
+    .then(function(result) {
+      btn.disabled = false;
+      btn.textContent = 'Verifikasi & Masuk';
+      var data = result.data;
+      if (data.success === true || (result.status === 200 && data.success !== false)) {
         clearInterval(_resendInterval);
         saveSession(_loginEmail);
         showDashboard(_loginEmail);
         showToast('\u2713 Selamat datang, ' + _loginEmail + '!', true);
       } else {
-        showLoginError('loginOtpError', 'Kode OTP salah atau sudah kadaluarsa.');
-        clearOtpBoxes(); shakeOtpBoxes();
+        showLoginError('loginOtpError', data.message || 'Kode OTP salah atau sudah kadaluarsa.');
+        clearOtpBoxes();
+        shakeOtpBoxes();
         document.getElementById('otp0').focus();
       }
     })
-    .catch(function() {
-      btn.disabled = false; btn.textContent = 'Verifikasi & Masuk';
-      showLoginError('loginOtpError', 'Kode OTP salah atau sudah kadaluarsa.');
-      clearOtpBoxes(); shakeOtpBoxes();
-      document.getElementById('otp0').focus();
+    .catch(function(err) {
+      btn.disabled = false;
+      btn.textContent = 'Verifikasi & Masuk';
+      console.error('[AdSpy] Fetch error:', err.name, err.message);
+      showLoginError('loginOtpError', 'Gagal terhubung ke server. Cek koneksi internet kamu.');
     });
   }
 
