@@ -255,7 +255,7 @@
   .scraper-run-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
 
   .scraper-advanced-row {
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -2727,22 +2727,23 @@
           </select>
         </div>
 
+        <!-- Jumlah Ads -->
+        <div class="scraper-field">
+          <span class="scraper-label">Jumlah Ads</span>
+          <input type="number" class="scraper-input" id="apifyCount" value="100" min="1" max="1000" style="width:100%">
+        </div>
+
       </div>
       <input type="hidden" id="apifyUrl">
     </div>
 
     <div class="scraper-advanced-row">
-      <span class="scraper-adv-label">Opsi</span>
-      <div class="scraper-adv-fields">
-        <div class="scraper-adv-field">
-          <label>Jumlah Ads</label>
-          <input type="number" class="scraper-adv-number" id="apifyCount" value="100" min="1" max="1000">
-        </div>
+      <div class="scraper-adv-fields" style="justify-content:flex-end">
+        <span id="tokenStatusChip" class="token-status-chip"></span>
         <button class="scraper-run-btn" id="runBtn" onclick="runApifyScraper()">
           <span id="runBtnIcon">&#9654;</span>
           <span id="runBtnText">Run Machine</span>
         </button>
-        <span id="tokenStatusChip" class="token-status-chip"></span>
       </div>
     </div>
 
