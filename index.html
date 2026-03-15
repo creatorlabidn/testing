@@ -5044,13 +5044,9 @@
 
     const url = 'https://www.facebook.com/ads/library/?' + params.toString();
 
-    // Update preview
-    const preview = document.getElementById('urlPreviewBox');
-    if (preview) preview.textContent = url;
-
-    // Juga update hidden apifyUrl supaya runApifyScraper() bisa baca
+    // Update hidden apifyUrl supaya runApifyScraper() bisa baca
     const apifyUrlEl = document.getElementById('apifyUrl');
-    if (apifyUrlEl && _activeScraperTab === 'form') apifyUrlEl.value = url;
+    if (apifyUrlEl) apifyUrlEl.value = url;
 
     return url;
   }
