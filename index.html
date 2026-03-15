@@ -2631,30 +2631,6 @@
   .login-resend:disabled { opacity: 0.4; cursor: not-allowed; }
   .login-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
 
-  /* OTP 6 boxes */
-  .otp-box {
-    width: 44px; height: 50px;
-    background: var(--surface);
-    border: 1.5px solid var(--border2);
-    border-radius: 9px;
-    text-align: center;
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 700;
-    font-size: 20px;
-    color: var(--text);
-    outline: none;
-    caret-color: var(--accent);
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .otp-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .otp-box.filled { border-color: var(--accent); }
-  .otp-box.shake { animation: otpShake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-  @keyframes otpShake {
-    10%,90% { transform: translateX(-2px); }
-    20%,80%  { transform: translateX(3px); }
-    30%,50%,70% { transform: translateX(-4px); }
-    40%,60%  { transform: translateX(4px); }
-  }
   .user-chip { display: inline-flex; align-items: center; gap: 7px; background: var(--surface); border: 1px solid var(--border2); border-radius: 999px; padding: 5px 12px 5px 8px; font-size: 12px; font-weight: 500; color: var(--text); }
   .user-chip-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .btn-logout { background: transparent; border: 1px solid var(--border2); color: var(--muted); font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
@@ -3294,7 +3270,7 @@
   // ─── LOGIN SYSTEM ─────────────────────────────────────────────
   // Webhook URLs (logika dari referensi login HTML)
   var WEBHOOK_URL        = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/e7692752-5f97-46da-b82d-646c9030e3f5';
-  var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
+  var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
   const LS_SESSION = 'adspy_session';
 
   var _loginEmail     = '';
@@ -3382,7 +3358,7 @@
   }
 
   // ── OTP box keyboard/input/paste behavior ──
-  (function initOtpBoxes() {
+  function initOtpBoxes() {
     for (var i = 0; i < 6; i++) {
       (function(idx) {
         const box = document.getElementById('otp' + idx);
@@ -3414,7 +3390,8 @@
         });
       })(i);
     }
-  })();
+  }
+  document.addEventListener('DOMContentLoaded', initOtpBoxes);
 
   // ── Step 1: Request OTP ──
   function requestOTP() {
