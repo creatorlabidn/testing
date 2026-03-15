@@ -2540,6 +2540,126 @@
   @media (max-width: 800px) { .scraper-form-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 540px) { .scraper-form-grid { grid-template-columns: 1fr; } }
 
+  /* ─── LOGIN SYSTEM ─────────────────────────────────────── */
+  .login-overlay {
+    position: fixed; inset: 0;
+    background: rgba(9,9,11,0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .login-overlay.hidden { display: none; }
+  .login-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.08);
+    animation: fadeUp 0.25s ease both;
+  }
+  .login-logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .login-logo .logo-spy { color: var(--accent); }
+  .login-tagline { font-size: 12px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .login-step { display: none; }
+  .login-step.active { display: block; }
+  .login-step-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 5px; letter-spacing: -0.3px; }
+  .login-step-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+  .login-step-sub strong { color: var(--text); }
+  .login-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .login-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); }
+  .login-input {
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 9px;
+    padding: 11px 13px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  .login-input:focus { border-color: var(--accent); }
+  .login-input::placeholder { color: var(--muted); }
+  .login-input.otp-input { font-size: 24px; font-weight: 700; letter-spacing: 10px; text-align: center; font-family: 'Bricolage Grotesque', sans-serif; padding: 13px; }
+  /* OTP individual boxes */
+  .otp-box {
+    width: 46px; height: 52px;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 9px;
+    text-align: center;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--text);
+    outline: none;
+    caret-color: var(--accent);
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .otp-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .otp-box.otp-filled { border-color: var(--accent); }
+  .otp-box.otp-shake { animation: otpShake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+  @keyframes otpShake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(3px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+  .login-btn {
+    width: 100%; background: var(--accent); color: #fff; border: none;
+    padding: 12px; border-radius: 9px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 4px;
+  }
+  .login-btn:hover:not(:disabled) { background: #c91f3a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,40,74,0.3); }
+  .login-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+  .login-error { font-size: 12px; color: var(--accent); background: #fef2f2; border: 1px solid rgba(232,40,74,0.2); border-radius: 7px; padding: 8px 12px; margin-top: 10px; display: none; line-height: 1.5; }
+  .login-error.visible { display: block; }
+  .login-success-msg { font-size: 12px; color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 7px; padding: 8px 12px; margin-top: 10px; display: none; line-height: 1.5; }
+  .login-success-msg.visible { display: block; }
+  .login-back { background: transparent; border: none; color: var(--muted); font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 0; margin-top: 12px; display: flex; align-items: center; gap: 4px; transition: color 0.15s; }
+  .login-back:hover { color: var(--text); }
+  .login-resend { background: transparent; border: none; color: #7c3aed; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 0; margin-top: 10px; display: block; width: 100%; text-align: center; transition: color 0.15s; }
+  .login-resend:hover:not(:disabled) { color: #5b21b6; text-decoration: underline; }
+  .login-resend:disabled { opacity: 0.4; cursor: not-allowed; }
+  .login-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+  /* OTP 6 boxes */
+  .otp-box {
+    width: 44px; height: 50px;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    border-radius: 9px;
+    text-align: center;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--text);
+    outline: none;
+    caret-color: var(--accent);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .otp-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .otp-box.filled { border-color: var(--accent); }
+  .otp-box.shake { animation: otpShake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+  @keyframes otpShake {
+    10%,90% { transform: translateX(-2px); }
+    20%,80%  { transform: translateX(3px); }
+    30%,50%,70% { transform: translateX(-4px); }
+    40%,60%  { transform: translateX(4px); }
+  }
+  .user-chip { display: inline-flex; align-items: center; gap: 7px; background: var(--surface); border: 1px solid var(--border2); border-radius: 999px; padding: 5px 12px 5px 8px; font-size: 12px; font-weight: 500; color: var(--text); }
+  .user-chip-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .btn-logout { background: transparent; border: 1px solid var(--border2); color: var(--muted); font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .btn-logout:hover { border-color: var(--accent); color: var(--accent); }
+
   .upload-dropzone {
     border: 2px dashed var(--border2);
     border-radius: 10px;
@@ -2593,10 +2713,58 @@
   .btn-col-header:hover { background: #dcfce7; border-color: #16a34a; }
   .col-header-badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px; display: none; align-items: center; justify-content: center; padding: 0 4px; }
 
+
 </style>
 </head>
 <body>
 
+<!-- ─── LOGIN OVERLAY ─────────────────────────────────────── -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box">
+    <div class="login-logo"><span class="logo-ad">Ad</span><span class="logo-spy">Spy</span></div>
+    <div class="login-tagline">FB Ads Intelligence by CreatorLab ID<br>Masuk untuk mengakses dashboard.</div>
+
+    <!-- Step 1: Input Email -->
+    <div class="login-step active" id="loginStepEmail">
+      <div class="login-step-title">Masukkan Email Kamu</div>
+      <div class="login-step-sub">Kami akan mengirimkan kode OTP ke email kamu.</div>
+      <div class="login-field">
+        <label class="login-label">Email</label>
+        <input type="email" class="login-input" id="loginEmail"
+          placeholder="nama@email.com"
+          onkeydown="if(event.key==='Enter') requestOTP()">
+      </div>
+      <button class="login-btn" id="loginSendBtn" onclick="requestOTP()">Kirim Kode OTP</button>
+      <div class="login-error" id="loginEmailError"></div>
+      <div class="login-success-msg" id="loginEmailSuccess"></div>
+      <div class="login-footer">Dengan masuk, kamu menyetujui penggunaan layanan ini.</div>
+    </div>
+
+    <!-- Step 2: Input OTP -->
+    <div class="login-step" id="loginStepOtp">
+      <div class="login-step-title">Masukkan Kode OTP</div>
+      <div class="login-step-sub">Kode 6 digit dikirim ke <strong id="loginEmailDisplay"></strong>.<br>Cek inbox atau folder spam kamu.</div>
+      <div class="login-field">
+        <label class="login-label">Kode OTP</label>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:4px">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1" id="otp0" autocomplete="one-time-code">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1" id="otp1">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1" id="otp2">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1" id="otp3">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1" id="otp4">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1" id="otp5">
+        </div>
+      </div>
+      <button class="login-btn" id="loginVerifyBtn" onclick="verifyOTP()">Verifikasi &amp; Masuk</button>
+      <div class="login-error" id="loginOtpError"></div>
+      <button class="login-resend" id="loginResendBtn" onclick="resendOTP()">Kirim ulang kode</button>
+      <span id="loginResendTimer" style="display:none;font-size:12px;color:var(--muted);text-align:center;margin-top:10px;display:none"></span>
+      <button class="login-back" onclick="backToEmail()">&#8592; Ganti email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── APP WRAPPER ──────────────────────────────────────────── -->
 <header>
   <div class="logo">
     <span class="logo-ad">Ad</span><span class="logo-spy">Spy</span>
@@ -2623,6 +2791,11 @@
       📁 Koleksi
       <span class="col-header-badge" id="colHeaderBadge"></span>
     </button>
+    <div class="user-chip" id="userChip" style="display:none">
+      <div class="user-chip-avatar" id="userAvatar">?</div>
+      <span id="userEmailDisplay" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    </div>
+    <button class="btn-logout" id="logoutBtn" style="display:none" onclick="logout()">Keluar</button>
     <button class="settings-btn" onclick="openSettings()" title="Settings">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7.5 9.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="1.3"/>
@@ -3115,6 +3288,245 @@
   let excludedAdvertisers = new Set();
   let excludedMeta = {};
   let excludedUrls = new Set();
+
+  // ─── LOGIN SYSTEM ─────────────────────────────────────────────
+  // Webhook URLs (dari referensi n8n)
+  // ─── LOGIN SYSTEM ─────────────────────────────────────────────
+  // Webhook URLs (logika dari referensi login HTML)
+  var WEBHOOK_URL        = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/e7692752-5f97-46da-b82d-646c9030e3f5';
+  var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
+  const LS_SESSION = 'adspy_session';
+
+  var _loginEmail     = '';
+  var _resendInterval = null;
+
+  // ── Session helpers ──
+  function getSession() {
+    try { const v = localStorage.getItem(LS_SESSION); return v ? JSON.parse(v) : null; } catch(e) { return null; }
+  }
+  function saveSession(email) {
+    try { localStorage.setItem(LS_SESSION, JSON.stringify({ email, loginAt: Date.now() })); } catch(e) {}
+  }
+  function clearSession() {
+    try { localStorage.removeItem(LS_SESSION); } catch(e) {}
+  }
+
+  // ── Show/hide overlay & steps ──
+  function showLoginStep(id) {
+    ['loginStepEmail','loginStepOtp'].forEach(function(s) {
+      const el = document.getElementById(s);
+      if (!el) return;
+      s === id ? el.classList.add('active') : el.classList.remove('active');
+    });
+  }
+
+  function checkLogin() {
+    const session = getSession();
+    if (session && session.email) { showDashboard(session.email); }
+  }
+
+  function showDashboard(email) {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    const chip = document.getElementById('userChip');
+    const avatar = document.getElementById('userAvatar');
+    const emailEl = document.getElementById('userEmailDisplay');
+    const logoutEl = document.getElementById('logoutBtn');
+    if (chip)     chip.style.display     = 'inline-flex';
+    if (logoutEl) logoutEl.style.display = 'inline-flex';
+    if (avatar)   avatar.textContent     = email.charAt(0).toUpperCase();
+    if (emailEl)  emailEl.textContent    = email;
+  }
+
+  function logout() {
+    if (!confirm('Yakin ingin keluar?')) return;
+    clearSession();
+    _loginEmail = '';
+    document.getElementById('loginEmail').value = '';
+    clearOtpBoxes();
+    ['loginEmailError','loginEmailSuccess','loginOtpError'].forEach(function(id) {
+      const el = document.getElementById(id); if (el) el.classList.remove('visible');
+    });
+    showLoginStep('loginStepEmail');
+    document.getElementById('userChip').style.display  = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('loginOverlay').classList.remove('hidden');
+  }
+
+  // ── Error messages ──
+  function showLoginError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return; el.textContent = msg; el.classList.add('visible');
+  }
+  function hideLoginError(id) {
+    const el = document.getElementById(id); if (el) el.classList.remove('visible');
+  }
+
+  // ── OTP boxes helpers ──
+  function clearOtpBoxes() {
+    for (var i = 0; i < 6; i++) {
+      const b = document.getElementById('otp' + i);
+      if (b) { b.value = ''; b.classList.remove('otp-filled'); }
+    }
+  }
+  function getOtpValue() {
+    var v = '';
+    for (var i = 0; i < 6; i++) { const b = document.getElementById('otp' + i); v += b ? b.value : ''; }
+    return v;
+  }
+  function shakeOtpBoxes() {
+    for (var i = 0; i < 6; i++) {
+      const b = document.getElementById('otp' + i);
+      if (!b) continue;
+      b.classList.remove('otp-shake'); void b.offsetWidth; b.classList.add('otp-shake');
+    }
+  }
+
+  // ── OTP box keyboard/input/paste behavior ──
+  (function initOtpBoxes() {
+    for (var i = 0; i < 6; i++) {
+      (function(idx) {
+        const box = document.getElementById('otp' + idx);
+        if (!box) return;
+        box.addEventListener('input', function(e) {
+          var v = e.target.value.replace(/\D/g, '');
+          e.target.value = v ? v[v.length - 1] : '';
+          e.target.classList.toggle('otp-filled', !!e.target.value);
+          if (v && idx < 5) document.getElementById('otp' + (idx + 1)).focus();
+          hideLoginError('loginOtpError');
+        });
+        box.addEventListener('keydown', function(e) {
+          if (e.key === 'Backspace' && !box.value && idx > 0) {
+            const prev = document.getElementById('otp' + (idx - 1));
+            prev.value = ''; prev.classList.remove('otp-filled'); prev.focus();
+          }
+          if (e.key === 'Enter') verifyOTP();
+        });
+        box.addEventListener('paste', function(e) {
+          e.preventDefault();
+          var pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+          pasted.split('').forEach(function(ch, j) {
+            if (idx + j < 6) {
+              const b = document.getElementById('otp' + (idx + j));
+              b.value = ch; b.classList.add('otp-filled');
+            }
+          });
+          document.getElementById('otp' + Math.min(idx + pasted.length, 5)).focus();
+        });
+      })(i);
+    }
+  })();
+
+  // ── Step 1: Request OTP ──
+  function requestOTP() {
+    const emailInput = document.getElementById('loginEmail');
+    const email      = emailInput.value.trim();
+    hideLoginError('loginEmailError');
+    hideLoginError('loginEmailSuccess');
+
+    if (!email) { showLoginError('loginEmailError', 'Email wajib diisi.'); emailInput.focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showLoginError('loginEmailError', 'Format email tidak valid.'); emailInput.focus(); return;
+    }
+
+    _loginEmail = email;
+    const btn = document.getElementById('loginSendBtn');
+    btn.disabled = true; btn.textContent = 'Mengirim...';
+
+    fetch(WEBHOOK_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_otp', email: email, timestamp: new Date().toISOString() })
+    })
+    .catch(function(e) { console.warn('Webhook error:', e); })
+    .finally(function() {
+      btn.disabled = false; btn.textContent = 'Kirim Kode OTP';
+      document.getElementById('loginEmailDisplay').textContent = email;
+      showLoginStep('loginStepOtp');
+      setTimeout(function() { const b = document.getElementById('otp0'); if (b) b.focus(); }, 120);
+      startResendTimer(60);
+    });
+  }
+
+  // ── Step 2: Verify OTP ──
+  function verifyOTP() {
+    const otp = getOtpValue();
+    hideLoginError('loginOtpError');
+
+    if (otp.length < 6) {
+      showLoginError('loginOtpError', 'Masukkan 6 digit kode OTP.');
+      shakeOtpBoxes(); return;
+    }
+
+    const btn = document.getElementById('loginVerifyBtn');
+    btn.disabled = true; btn.textContent = 'Memverifikasi...';
+
+    fetch(WEBHOOK_OTP_VERIFY, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'verify_otp', email: _loginEmail, otp: otp, timestamp: new Date().toISOString() })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      btn.disabled = false; btn.textContent = 'Verifikasi & Masuk';
+      if (data && data.success === true) {
+        clearInterval(_resendInterval);
+        saveSession(_loginEmail);
+        showDashboard(_loginEmail);
+        showToast('\u2713 Selamat datang, ' + _loginEmail + '!', true);
+      } else {
+        showLoginError('loginOtpError', 'Kode OTP salah atau sudah kadaluarsa.');
+        clearOtpBoxes(); shakeOtpBoxes();
+        document.getElementById('otp0').focus();
+      }
+    })
+    .catch(function() {
+      btn.disabled = false; btn.textContent = 'Verifikasi & Masuk';
+      showLoginError('loginOtpError', 'Kode OTP salah atau sudah kadaluarsa.');
+      clearOtpBoxes(); shakeOtpBoxes();
+      document.getElementById('otp0').focus();
+    });
+  }
+
+  // ── Resend OTP ──
+  function resendOTP() {
+    clearOtpBoxes(); hideLoginError('loginOtpError');
+    fetch(WEBHOOK_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'resend_otp', email: _loginEmail, timestamp: new Date().toISOString() })
+    }).catch(function(e) { console.warn(e); });
+    startResendTimer(60);
+    setTimeout(function() { document.getElementById('otp0').focus(); }, 50);
+  }
+
+  // ── Back to email ──
+  function backToEmail() {
+    clearInterval(_resendInterval);
+    clearOtpBoxes(); hideLoginError('loginOtpError');
+    const btn = document.getElementById('loginResendBtn');
+    if (btn) { btn.disabled = false; btn.textContent = 'Kirim ulang kode'; }
+    showLoginStep('loginStepEmail');
+  }
+
+  // ── Resend countdown ──
+  function startResendTimer(sec) {
+    const btn = document.getElementById('loginResendBtn');
+    if (!btn) return;
+    var left = sec;
+    btn.disabled = true; btn.textContent = 'Kirim ulang (' + left + 's)';
+    clearInterval(_resendInterval);
+    _resendInterval = setInterval(function() {
+      left--;
+      if (left <= 0) { clearInterval(_resendInterval); btn.disabled = false; btn.textContent = 'Kirim ulang kode'; }
+      else { btn.textContent = 'Kirim ulang (' + left + 's)'; }
+    }, 1000);
+  }
+
+  // ── Enter key on email field ──
+  (function() {
+    const el = document.getElementById('loginEmail');
+    if (el) el.addEventListener('keydown', function(e) { if (e.key === 'Enter') requestOTP(); });
+  })();
+
+  // ── Cek session saat load ──
+  checkLogin();
 
   // ─── STORAGE KEYS ─────────────────────────────────────────────
   const LS_TOKEN     = 'adspy_apify_token';
@@ -5188,5 +5600,6 @@
 
 
 </script>
+
 </body>
-</html>
+</html></html>
