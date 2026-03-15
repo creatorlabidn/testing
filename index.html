@@ -3269,7 +3269,7 @@
   // Webhook URLs (dari referensi n8n)
   // ─── LOGIN SYSTEM ─────────────────────────────────────────────
   // Webhook URLs (logika dari referensi login HTML)
-  var WEBHOOK_URL        = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/e7692752-5f97-46da-b82d-646c9030e3f5';
+  var WEBHOOK_URL        = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/e7692752-5f97-46da-b82d-646c9030e3f5';
   var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
   const LS_SESSION = 'adspy_session';
 
@@ -3467,13 +3467,17 @@
       btn.disabled = false;
       btn.textContent = 'Verifikasi & Masuk';
       var data = result.data;
-      if (data.success === true || (result.status === 200 && data.success !== false)) {
+      // n8n return array — ambil elemen pertama
+      var record = Array.isArray(data) ? data[0] : data;
+      // Sukses HANYA jika status === "valid"
+      var isValid = record && record.status === 'valid';
+      if (isValid) {
         clearInterval(_resendInterval);
         saveSession(_loginEmail);
         showDashboard(_loginEmail);
         showToast('\u2713 Selamat datang, ' + _loginEmail + '!', true);
       } else {
-        showLoginError('loginOtpError', data.message || 'Kode OTP salah atau sudah kadaluarsa.');
+        showLoginError('loginOtpError', (record && record.message) || 'Kode OTP salah atau sudah kadaluarsa.');
         clearOtpBoxes();
         shakeOtpBoxes();
         document.getElementById('otp0').focus();
