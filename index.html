@@ -3418,7 +3418,7 @@
     // ── STEP 1: Verifikasi email ──
     let verifyText = '';
     try {
-      const verifyResp = await fetch('https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/d32ed8c4-bf0b-4b49-9535-3561e12da517', {
+      const verifyResp = await fetch('https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/d32ed8c4-bf0b-4b49-9535-3561e12da517', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
