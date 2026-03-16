@@ -3269,8 +3269,8 @@
   // Webhook URLs (dari referensi n8n)
   // ─── LOGIN SYSTEM ─────────────────────────────────────────────
   // Webhook URLs (logika dari referensi login HTML)
-  var WEBHOOK_URL        = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/e7692752-5f97-46da-b82d-646c9030e3f5';
-  var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
+  var WEBHOOK_URL        = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/e7692752-5f97-46da-b82d-646c9030e3f5';
+  var WEBHOOK_OTP_VERIFY = 'https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook/8b77e5fa-f6ac-4f7f-97d8-0c9be705f49e';
   const LS_SESSION = 'adspy_session';
 
   var _loginEmail     = '';
@@ -3393,74 +3393,8 @@
   }
   document.addEventListener('DOMContentLoaded', initOtpBoxes);
 
-// ── Fungsi ini BERDIRI SENDIRI, di luar requestOTP() ──
-function showLoginErrorWithBtn(msg) {
-  const el = document.getElementById('loginEmailError');
-  if (!el) return;
-  el.innerHTML = msg + ' <a href="https://creatorlabidn.com/form-order-adspy" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;margin-top:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;padding:7px 16px;border-radius:7px;text-decoration:none;transition:background 0.15s" onmouseover="this.style.background=\'#c91f3a\'" onmouseout="this.style.background=\'var(--accent)\'">Beli Sekarang →</a>';
-  el.classList.add('visible');
-}
-
-// ── Fungsi ini BERDIRI SENDIRI juga ──
-async function requestOTP() {
-  const emailInput = document.getElementById('loginEmail');
-  const email      = emailInput.value.trim();
-  hideLoginError('loginEmailError');
-  hideLoginError('loginEmailSuccess');
-
-  if (!email) { showLoginError('loginEmailError', 'Email wajib diisi.'); emailInput.focus(); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showLoginError('loginEmailError', 'Format email tidak valid.'); emailInput.focus(); return;
-  }
-
-  _loginEmail = email;
-  const btn = document.getElementById('loginSendBtn');
-  btn.disabled = true; btn.textContent = 'Memverifikasi email...';
-
-  // ── STEP 1: Verifikasi email ──
-  let verifyText = '';
-  try {
-    const verifyResp = await fetch('https://n8n-wexrffsqeapb.sate.sumopod.my.id/webhook-test/d32ed8c4-bf0b-4b49-9535-3561e12da517', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, timestamp: new Date().toISOString() })
-    });
-    verifyText = (await verifyResp.text()).trim();
-  } catch (err) {
-    btn.disabled = false; btn.textContent = 'Kirim Kode OTP';
-    showLoginError('loginEmailError', 'Gagal terhubung ke server verifikasi. Cek koneksi internet kamu.');
-    return;
-  }
-
-  // ── STEP 2: Cek respons ──
-  if (verifyText !== 'true') {
-    btn.disabled = false; btn.textContent = 'Kirim Kode OTP';
-    if (verifyText) {
-      showLoginError('loginEmailError', verifyText);
-    } else {
-      showLoginErrorWithBtn('Email ini tidak pernah melakukan pembelian Tools AdSpy.');
-    }
-    return;
-  }
-
-  // ── STEP 3: Lolos → kirim OTP ──
-  btn.textContent = 'Mengirim OTP...';
-  fetch(WEBHOOK_URL, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'request_otp', email: email, timestamp: new Date().toISOString() })
-  })
-  .catch(function(e) { console.warn('Webhook error:', e); })
-  .finally(function() {
-    btn.disabled = false; btn.textContent = 'Kirim Kode OTP';
-    document.getElementById('loginEmailDisplay').textContent = email;
-    showLoginStep('loginStepOtp');
-    setTimeout(function() { const b = document.getElementById('otp0'); if (b) b.focus(); }, 120);
-    startResendTimer(60);
-  });
-}
-  
   // ── Step 1: Request OTP ──
-async function requestOTP() {
+  function requestOTP() {
     const emailInput = document.getElementById('loginEmail');
     const email      = emailInput.value.trim();
     hideLoginError('loginEmailError');
@@ -3473,7 +3407,21 @@ async function requestOTP() {
 
     _loginEmail = email;
     const btn = document.getElementById('loginSendBtn');
-    btn.disabled = true; btn.textContent = 'Memverifikasi email...';
+    btn.disabled = true; btn.textContent = 'Mengirim...';
+
+    fetch(WEBHOOK_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_otp', email: email, timestamp: new Date().toISOString() })
+    })
+    .catch(function(e) { console.warn('Webhook error:', e); })
+    .finally(function() {
+      btn.disabled = false; btn.textContent = 'Kirim Kode OTP';
+      document.getElementById('loginEmailDisplay').textContent = email;
+      showLoginStep('loginStepOtp');
+      setTimeout(function() { const b = document.getElementById('otp0'); if (b) b.focus(); }, 120);
+      startResendTimer(60);
+    });
+  }
 
   // ── Step 2: Verify OTP ──
   function verifyOTP() {
