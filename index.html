@@ -3393,22 +3393,6 @@
   }
   document.addEventListener('DOMContentLoaded', initOtpBoxes);
 
-  // ── Step 1: Request OTP ──
-async function requestOTP() {
-    const emailInput = document.getElementById('loginEmail');
-    const email      = emailInput.value.trim();
-    hideLoginError('loginEmailError');
-    hideLoginError('loginEmailSuccess');
-
-    if (!email) { showLoginError('loginEmailError', 'Email wajib diisi.'); emailInput.focus(); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showLoginError('loginEmailError', 'Format email tidak valid.'); emailInput.focus(); return;
-    }
-
-    _loginEmail = email;
-    const btn = document.getElementById('loginSendBtn');
-    btn.disabled = true; btn.textContent = 'Memverifikasi email...';
-
 // ── Fungsi ini BERDIRI SENDIRI, di luar requestOTP() ──
 function showLoginErrorWithBtn(msg) {
   const el = document.getElementById('loginEmailError');
@@ -3474,6 +3458,22 @@ async function requestOTP() {
     startResendTimer(60);
   });
 }
+  
+  // ── Step 1: Request OTP ──
+async function requestOTP() {
+    const emailInput = document.getElementById('loginEmail');
+    const email      = emailInput.value.trim();
+    hideLoginError('loginEmailError');
+    hideLoginError('loginEmailSuccess');
+
+    if (!email) { showLoginError('loginEmailError', 'Email wajib diisi.'); emailInput.focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showLoginError('loginEmailError', 'Format email tidak valid.'); emailInput.focus(); return;
+    }
+
+    _loginEmail = email;
+    const btn = document.getElementById('loginSendBtn');
+    btn.disabled = true; btn.textContent = 'Memverifikasi email...';
 
   // ── Step 2: Verify OTP ──
   function verifyOTP() {
