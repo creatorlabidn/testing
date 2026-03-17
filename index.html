@@ -2689,7 +2689,27 @@
   .btn-col-header:hover { background: #dcfce7; border-color: #16a34a; }
   .col-header-badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px; display: none; align-items: center; justify-content: center; padding: 0 4px; }
 
-
+/* ─── EXCLUDE MANAGER ──────────────────────────────────────── */
+  .exclude-manager-modal-bg { display: none; position: fixed; inset: 0; background: rgba(9,9,11,0.45); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 24px; }
+  .exclude-manager-modal-bg.open { display: flex; }
+  .exclude-manager-modal { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; max-width: 640px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 32px 80px rgba(0,0,0,0.14); animation: fadeUp 0.2s ease both; }
+  .exclude-manager-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .exclude-manager-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; flex: 1; }
+  .exclude-manager-body { overflow-y: auto; flex: 1; }
+  .exclude-manager-section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .exclude-manager-section:last-child { border-bottom: none; }
+  .exclude-manager-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .exclude-manager-section-title span { background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; font-size: 10px; font-weight: 700; color: var(--text); }
+  .exclude-manager-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+  .exclude-manager-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .exclude-manager-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: var(--surface2); border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .exclude-manager-name { flex: 1; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .exclude-manager-del { background: transparent; border: 1px solid rgba(232,40,74,0.2); color: var(--accent); font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; flex-shrink: 0; }
+  .exclude-manager-del:hover { background: rgba(232,40,74,0.08); }
+  .exclude-manager-empty { font-size: 12px; color: var(--muted); font-style: italic; padding: 10px 0; }
+  .btn-exclude-manager { display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid rgba(232,40,74,0.2); color: var(--accent); font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; position: relative; }
+  .btn-exclude-manager:hover { background: rgba(232,40,74,0.1); }
+  .exclude-manager-badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px; display: none; align-items: center; justify-content: center; padding: 0 4px; }
 </style>
 </head>
 <body>
@@ -2763,9 +2783,13 @@
       </svg>
       Request Fitur
     </a>
-    <button class="btn-col-header" onclick="openCollections()" title="Saved Collections">
+<button class="btn-col-header" onclick="openCollections()" title="Saved Collections">
       📁 Koleksi
       <span class="col-header-badge" id="colHeaderBadge"></span>
+    </button>
+    <button class="btn-exclude-manager" onclick="openExcludeManager()" title="Kelola Advertiser & URL yang disembunyikan" id="excludeManagerBtn">
+      🚫 Hidden
+      <span class="exclude-manager-badge" id="excludeManagerBadge"></span>
     </button>
     <div class="user-chip" id="userChip" style="display:none">
       <div class="user-chip-avatar" id="userAvatar">?</div>
@@ -3148,6 +3172,17 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- EXCLUDE MANAGER MODAL -->
+<div class="exclude-manager-modal-bg" id="excludeManagerModalBg" onclick="closeExcludeManagerModal(event)">
+  <div class="exclude-manager-modal">
+    <div class="exclude-manager-header">
+      <div class="exclude-manager-title">🚫 Kelola Hidden Advertiser &amp; Domain</div>
+      <button class="info-modal-close" onclick="closeExcludeManagerDirect()">&#10005;</button>
+    </div>
+    <div class="exclude-manager-body" id="excludeManagerBody"></div>
   </div>
 </div>
 
@@ -3571,11 +3606,13 @@
   checkLogin();
 
   // ─── STORAGE KEYS ─────────────────────────────────────────────
-  const LS_TOKEN     = 'adspy_apify_token';
-  const LS_HISTORY   = 'adspy_url_history';
-  const LS_DATA      = 'adspy_last_data';
-  const LS_BOOKMARKS = null; // Bookmark sekarang hanya sementara (session only, tidak disimpan ke localStorage)
-  const MAX_HISTORY  = 20;
+const LS_TOKEN                = 'adspy_apify_token';
+const LS_HISTORY              = 'adspy_url_history';
+const LS_DATA                 = 'adspy_last_data';
+const LS_BOOKMARKS            = null;
+const MAX_HISTORY             = 20;
+const LS_EXCLUDED_ADVERTISERS = 'adspy_excluded_advertisers';
+const LS_EXCLUDED_URLS        = 'adspy_excluded_urls';
 
   // ─── STORAGE LAYER ────────────────────────────────────────────
   // FIX: Token dan bookmark pakai localStorage LANGSUNG (bukan cookie-first).
@@ -3803,12 +3840,12 @@
     } catch(e) { collections = []; }
     updateColHeaderBadge();
   }
-
+  
   function saveCollections() {
     store.set(LS_COLLECTIONS, JSON.stringify(collections));
     updateColHeaderBadge();
   }
-
+  
   function getColItems(colId) {
     try {
       const v = store.get(LS_COL_ITEMS_PREFIX + colId);
@@ -3852,6 +3889,106 @@
     const total = collections.reduce((sum, col) => sum + getColItems(col.id).length, 0);
     badge.textContent = total;
     badge.style.display = total > 0 ? 'flex' : 'none';
+  }
+  // ─── PERSISTENT EXCLUDE — LOAD/SAVE/MANAGER ──────────────────
+  function loadExcluded() {
+    try {
+      const savedAdv = store.get(LS_EXCLUDED_ADVERTISERS);
+      if (savedAdv) {
+        JSON.parse(savedAdv).forEach(item => {
+          excludedAdvertisers.add(item.key);
+          excludedMeta[item.key] = { name: item.name, avatar: item.avatar || '' };
+        });
+      }
+    } catch(e) { console.warn('AdSpy: gagal load excluded advertisers', e); }
+    try {
+      const savedUrls = store.get(LS_EXCLUDED_URLS);
+      if (savedUrls) {
+        JSON.parse(savedUrls).forEach(pattern => excludedUrls.add(pattern));
+      }
+    } catch(e) { console.warn('AdSpy: gagal load excluded URLs', e); }
+  }
+
+  function saveExcluded() {
+    try {
+      store.set(LS_EXCLUDED_ADVERTISERS, JSON.stringify(
+        [...excludedAdvertisers].map(key => ({
+          key,
+          name: excludedMeta[key]?.name || key,
+          avatar: excludedMeta[key]?.avatar || ''
+        }))
+      ));
+    } catch(e) { console.warn('AdSpy: gagal simpan excluded advertisers', e); }
+    try {
+      store.set(LS_EXCLUDED_URLS, JSON.stringify([...excludedUrls]));
+    } catch(e) { console.warn('AdSpy: gagal simpan excluded URLs', e); }
+    updateExcludeManagerBadge();
+  }
+
+  function updateExcludeManagerBadge() {
+    const badge = document.getElementById('excludeManagerBadge');
+    if (!badge) return;
+    const total = excludedAdvertisers.size + excludedUrls.size;
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+  }
+
+  function openExcludeManager() {
+    renderExcludeManager();
+    document.getElementById('excludeManagerModalBg').classList.add('open');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeExcludeManagerModal(e) {
+    if (e.target === document.getElementById('excludeManagerModalBg')) closeExcludeManagerDirect();
+  }
+
+  function closeExcludeManagerDirect() {
+    document.getElementById('excludeManagerModalBg').classList.remove('open');
+    if (!document.querySelector('.modal-bg.open, .info-modal-bg.open, .settings-modal-bg.open'))
+      document.body.classList.remove('modal-open');
+  }
+
+  function renderExcludeManager() {
+    const body = document.getElementById('excludeManagerBody');
+    if (!body) return;
+    const advHtml = excludedAdvertisers.size === 0
+      ? '<div class="exclude-manager-empty">Belum ada advertiser yang disembunyikan.</div>'
+      : [...excludedAdvertisers].map(key => {
+          const meta = excludedMeta[key] || {};
+          const avatarHtml = meta.avatar
+            ? '<img class="exclude-manager-avatar" src="' + escHtml(meta.avatar) + '" onerror="this.textContent=\'🚫\'">'
+            : '<div class="exclude-manager-avatar">🚫</div>';
+          return '<div class="exclude-manager-item">' + avatarHtml +
+            '<span class="exclude-manager-name">' + escHtml(meta.name || key) + '</span>' +
+            '<button class="exclude-manager-del" onclick="unexcludeAdvertiser(\'' + escHtml(key) + '\');renderExcludeManager();">Tampilkan</button>' +
+            '</div>';
+        }).join('');
+    const urlHtml = excludedUrls.size === 0
+      ? '<div class="exclude-manager-empty">Belum ada domain/URL yang disembunyikan.</div>'
+      : [...excludedUrls].map(p =>
+          '<div class="exclude-manager-item">' +
+          '<div class="exclude-manager-avatar">🔗</div>' +
+          '<span class="exclude-manager-name" style="font-family:\'DM Mono\',monospace;font-size:11px">' + escHtml(p) + '</span>' +
+          '<button class="exclude-manager-del" style="border-color:rgba(29,78,216,0.3);color:#1d4ed8" onclick="unexcludeUrl(\'' + escHtml(p) + '\');renderExcludeManager();">Tampilkan</button>' +
+          '</div>'
+        ).join('');
+    body.innerHTML =
+      '<div class="exclude-manager-section">' +
+        '<div class="exclude-manager-section-title">🚫 Advertiser Disembunyikan <span>' + excludedAdvertisers.size + '</span>' +
+          (excludedAdvertisers.size > 0 ? '<button onclick="clearAllExcluded();renderExcludeManager();" style="margin-left:auto;background:transparent;border:1px solid rgba(232,40,74,0.3);color:var(--accent);font-size:10px;font-weight:600;padding:3px 10px;border-radius:999px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Hapus Semua</button>' : '') +
+        '</div>' +
+        '<div class="exclude-manager-list">' + advHtml + '</div>' +
+      '</div>' +
+      '<div class="exclude-manager-section">' +
+        '<div class="exclude-manager-section-title">🔗 Domain / URL Disembunyikan <span>' + excludedUrls.size + '</span>' +
+          (excludedUrls.size > 0 ? '<button onclick="clearAllExcludedUrls();renderExcludeManager();" style="margin-left:auto;background:transparent;border:1px solid rgba(29,78,216,0.3);color:#1d4ed8;font-size:10px;font-weight:600;padding:3px 10px;border-radius:999px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">Hapus Semua</button>' : '') +
+        '</div>' +
+        '<div class="exclude-manager-list">' + urlHtml + '</div>' +
+      '</div>' +
+      '<div class="exclude-manager-section" style="background:#fffbeb;border-top:1px solid #fde68a">' +
+        '<div style="font-size:11px;color:#92400e;line-height:1.6">💡 <strong>Data ini tersimpan permanen</strong> di browser kamu. Advertiser dan domain yang kamu sembunyikan akan otomatis difilter setiap kali kamu membuka AdSpy.</div>' +
+      '</div>';
   }
 
   // ── Dropdown pilih koleksi di card ──────────────────────────
@@ -3954,7 +4091,7 @@
     // Refresh tampilan koleksi jika modal terbuka
     if (activeColId === colId) renderColContent(colId);
   }
-
+  
   function updateCardColBtn(adId) {
     // Cari semua tombol koleksi dengan adId ini dan update tampilannya
     const cols = getAdCollections(adId);
@@ -4115,6 +4252,7 @@
     renderColContent(colId);
     showToast('Iklan dihapus dari koleksi', false);
   }
+  
 
   function deleteCollection(e, colId) {
     e.stopPropagation();
@@ -4236,24 +4374,27 @@
   // 1. loadBookmarks()  → isi bookmarkedIds dari localStorage
   // 2. getAdData()       → ambil data iklan
   // 3. applyFilters()    → render kartu (sudah tahu mana yang bookmarked)
-  (function init() {
+(function init() {
     updateTokenChip();
 
-    // STEP 1: Load bookmark & collections dulu (sinkron)
+    // STEP 1: Load bookmark, collections & excluded (sinkron)
     loadBookmarks();
     loadCollections();
+    loadExcluded();
+    updateExcludeManagerBadge();
 
     // STEP 2: Restore data iklan
     try {
       const parsed = getAdData();
       if (parsed && Array.isArray(parsed) && parsed.length > 0) {
         allData = parsed;
-        // STEP 3: Render — bookmarkedIds sudah terisi di STEP 1
         applyFilters();
         document.getElementById('statsSection').style.display = 'block';
         document.getElementById('emptyState').style.display = 'none';
         updateStats();
         populateFormatFilter();
+        renderExcludePanel();
+        renderExcludeUrlPanel();
         const banner = document.getElementById('dataSource');
         if (banner) banner.textContent = parsed.length + ' iklan (sesi sebelumnya)';
       }
@@ -4572,10 +4713,9 @@
     showToast(data.length + ' iklan berhasil dimuat!', true);
   }
 
-  function updateStats() {
+function updateStats() {
     document.getElementById('statTotal').textContent = allData.length;
     document.getElementById('statActive').textContent = allData.filter(a => a.is_active).length;
-    document.getElementById('statNonActive').textContent = allData.filter(a => !a.is_active).length;
     document.getElementById('statWinning').textContent = allData.filter(a => calcWinningScore(a) >= 80).length;
     document.getElementById('statTrending').textContent = allData.filter(a => isTrending(a)).length;
     document.getElementById('statDuplicate').textContent = allData.filter(a => isDuplicate(a)).length;
@@ -4741,7 +4881,7 @@
 
   // ─── EXCLUDE ─────────────────────────────────────────────────
 
-  function excludeAdvertiser(pageName, pageId) {
+function excludeAdvertiser(pageName, pageId) {
     if (!pageName && !pageId) return;
     const key = pageId ? 'id:' + pageId : 'name:' + (pageName || '').trim().toLowerCase();
     if (excludedAdvertisers.has(key)) { showToast('"' + pageName + '" sudah di-exclude', false); return; }
@@ -4749,27 +4889,30 @@
     const avatar = adRef?.snapshot?.page_profile_picture_url || '';
     excludedAdvertisers.add(key);
     excludedMeta[key] = { name: pageName || '(unknown)', avatar };
+    saveExcluded();
     renderExcludePanel();
     applyFilters({ preservePage: true });
-    showToast('&#128683; "' + (pageName || 'Advertiser') + '" disembunyikan', false);
+    showToast('🚫 "' + (pageName || 'Advertiser') + '" disembunyikan (tersimpan permanen)', false);
   }
 
-  function unexcludeAdvertiser(key) {
+function unexcludeAdvertiser(key) {
     const name = excludedMeta[key]?.name || key;
     excludedAdvertisers.delete(key);
     delete excludedMeta[key];
+    saveExcluded();
     renderExcludePanel();
     applyFilters({ preservePage: true });
-    showToast('&#10003; "' + name + '" ditampilkan kembali', true);
+    showToast('✓ "' + name + '" ditampilkan kembali', true);
   }
 
-  function clearAllExcluded() {
+function clearAllExcluded() {
     const count = excludedAdvertisers.size;
     excludedAdvertisers.clear();
     excludedMeta = {};
+    saveExcluded();
     renderExcludePanel();
     applyFilters({ preservePage: true });
-    showToast('&#10003; ' + count + ' advertiser ditampilkan kembali', true);
+    showToast('✓ ' + count + ' advertiser ditampilkan kembali', true);
   }
 
   function extractDomain(url) {
@@ -4781,29 +4924,32 @@
     }
   }
 
-  function excludeUrl(pattern) {
+function excludeUrl(pattern) {
     pattern = pattern.trim().toLowerCase();
     if (!pattern) return;
     if (excludedUrls.has(pattern)) { showToast('"' + pattern + '" sudah di-exclude', false); return; }
     excludedUrls.add(pattern);
+    saveExcluded();
     renderExcludeUrlPanel();
     applyFilters({ preservePage: true });
-    showToast('&#128279; "' + pattern + '" disembunyikan', false);
+    showToast('🔗 "' + pattern + '" disembunyikan (tersimpan permanen)', false);
   }
 
-  function unexcludeUrl(pattern) {
+function unexcludeUrl(pattern) {
     excludedUrls.delete(pattern);
+    saveExcluded();
     renderExcludeUrlPanel();
     applyFilters({ preservePage: true });
-    showToast('&#10003; "' + pattern + '" ditampilkan kembali', true);
+    showToast('✓ "' + pattern + '" ditampilkan kembali', true);
   }
 
-  function clearAllExcludedUrls() {
+function clearAllExcludedUrls() {
     const count = excludedUrls.size;
     excludedUrls.clear();
+    saveExcluded();
     renderExcludeUrlPanel();
     applyFilters({ preservePage: true });
-    showToast('&#10003; ' + count + ' URL ditampilkan kembali', true);
+    showToast('✓ ' + count + ' URL ditampilkan kembali', true);
   }
 
   function renderExcludeUrlPanel() {
@@ -4912,15 +5058,16 @@
     dropdown.classList.add('open');
   }
 
-  function selectExcludeAdvertiser(key, name, avatar) {
+function selectExcludeAdvertiser(key, name, avatar) {
     if (excludedAdvertisers.has(key)) return;
     excludedAdvertisers.add(key);
     excludedMeta[key] = { name, avatar: avatar || '' };
+    saveExcluded();
     document.getElementById('excludeInput').value = '';
     document.getElementById('excludeDropdown').classList.remove('open');
     renderExcludePanel();
     applyFilters({ preservePage: true });
-    showToast('&#128683; "' + name + '" disembunyikan', false);
+    showToast('🚫 "' + name + '" disembunyikan (tersimpan permanen)', false);
   }
 
   document.addEventListener('click', e => {
@@ -4961,7 +5108,7 @@
         <div class="info-desc">Winning Score (0–100) mengukur seberapa "proven" sebuah iklan berdasarkan tiga faktor: durasi aktif, jumlah variasi/duplikat, dan status aktif saat ini.</div>
         <div>
           <div class="info-section-label">Formula</div>
-          <div class="formula-eq">Score = <span class="fp fp-duration">Durasi</span> <span class="fp-op">+</span> <span class="fp fp-scale">Scale</span> <span class="fp-op">+</span> <span class="fp fp-active">Aktif</span> <span class="fp-op">+</span> <span class="fp fp-dpa">DPA</span> <span class="fp-op">→ max</span> <span class="fp fp-max">100</span></div>
+          <div class="formula-eq">Score = <span class="fp fp-duration">Durasi</span> <span class="fp-op">+</span> <span class="fp fp-scale">Scale</span> <span class="fp-op">+</span> <span class="fp fp-active">Aktif</span> <span class="fp-op">→ max</span> <span class="fp fp-max">100</span></div>
         </div>
         <div>
           <div class="info-section-label">🧮 Kalkulator Live</div>
@@ -5623,14 +5770,13 @@
     reader.readAsText(file, 'UTF-8');
   }
 
-  function clearAll() {
+function clearAll() {
     allData = []; filteredData = [];
     document.getElementById('adsGrid').innerHTML = '';
     document.getElementById('statsSection').style.display = 'none';
     document.getElementById('emptyState').style.display = 'block';
     document.getElementById('dataSource').textContent = '';
-    excludedAdvertisers.clear(); excludedMeta = {};
-    excludedUrls.clear();
+    // ★ excluded TIDAK dihapus — biarkan persisten
     renderExcludePanel();
     renderExcludeUrlPanel();
     const ss = document.getElementById('scraperStatus');
