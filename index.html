@@ -5116,7 +5116,6 @@ function selectExcludeAdvertiser(key, name, avatar) {
             <div class="calc-row"><span class="calc-label">Durasi aktif</span><input type="range" class="calc-slider" id="calcDays" min="0" max="400" value="90" oninput="updateCalc()"><span class="calc-val" id="calcDaysVal">90 hr</span></div>
             <div class="calc-row"><span class="calc-label">Collation count</span><input type="range" class="calc-slider" id="calcColl" min="1" max="10" value="3" oninput="updateCalc()"><span class="calc-val" id="calcCollVal">3×</span></div>
             <div class="calc-check-row"><input type="checkbox" class="calc-check" id="calcActive" checked onchange="updateCalc()"><span class="calc-label" style="min-width:auto">Iklan masih aktif (+15)</span></div>
-            <div class="calc-check-row"><input type="checkbox" class="calc-check" id="calcDpa" onchange="updateCalc()"><span class="calc-label" style="min-width:auto">Format DPA (+5)</span></div>
             <div class="calc-result" id="calcResult">
               <div class="calc-score-big" id="calcScoreBig" style="color:var(--accent)">—</div>
               <div class="calc-meta"><div class="calc-tier" id="calcTier">—</div><div class="calc-breakdown" id="calcBreakdown">—</div><div class="score-bar-wrap"><div class="score-bar-fill" id="calcBar"></div></div></div>
@@ -5190,7 +5189,6 @@ function selectExcludeAdvertiser(key, name, avatar) {
     const days = parseInt(document.getElementById('calcDays')?.value || 90);
     const coll = parseInt(document.getElementById('calcColl')?.value || 3);
     const isActive = document.getElementById('calcActive')?.checked ?? true;
-    const isDpaCheck = document.getElementById('calcDpa')?.checked ?? false;
     document.getElementById('calcDaysVal').textContent = days + ' hr';
     document.getElementById('calcCollVal').textContent = coll + '×';
     let durScore = 0;
@@ -5199,8 +5197,7 @@ function selectExcludeAdvertiser(key, name, avatar) {
     let scaleScore = 0;
     if (coll >= 7) scaleScore = 35; else if (coll >= 4) scaleScore = 25; else if (coll >= 2) scaleScore = 14; else scaleScore = 2;
     const activeBonus = isActive ? 15 : 0;
-    const dpaBonus = isDpaCheck ? 5 : 0;
-    const total = Math.min(durScore + scaleScore + activeBonus + dpaBonus, 100);
+    const total = Math.min(durScore + scaleScore + activeBonus, 100);
     const bigEl = document.getElementById('calcScoreBig');
     const tierEl = document.getElementById('calcTier');
     const breakEl = document.getElementById('calcBreakdown');
@@ -5214,7 +5211,7 @@ function selectExcludeAdvertiser(key, name, avatar) {
     bigEl.style.color = tierColor;
     tierEl.innerHTML = tierLabel;
     tierEl.style.color = tierColor;
-    breakEl.innerHTML = 'Durasi: +' + durScore + ' | Scale: +' + scaleScore + ' | Aktif: +' + activeBonus + ' | DPA: +' + dpaBonus;
+    breakEl.innerHTML = 'Durasi: +' + durScore + ' | Scale: +' + scaleScore + ' | Aktif: +' + activeBonus;
     barEl.style.width = total + '%';
     barEl.style.background = total >= 80 ? 'var(--accent)' : total >= 50 ? '#1d4ed8' : '#a1a1aa';
   }
