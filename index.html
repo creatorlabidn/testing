@@ -4783,8 +4783,7 @@ function updateStats() {
     else if (collCount >= 2) scaleScore = 14;
     else scaleScore = 2;
     const activeBonus = ad.is_active ? 15 : 0;
-    const dpaBonus = isDpa(ad) ? 5 : 0;
-    return Math.min(Math.round(durationScore + scaleScore + activeBonus + dpaBonus), 100);
+    return Math.min(Math.round(durationScore + scaleScore + activeBonus), 100);
   }
 
   function isTrending(ad) {
